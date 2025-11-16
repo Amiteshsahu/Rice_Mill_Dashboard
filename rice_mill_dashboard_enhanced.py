@@ -15,6 +15,802 @@ def format_percentage(x):
     return f"{x:.1f}%"
 
 
+def generate_ai_insights(results, inputs):
+    """Generate AI-powered insights and recommendations based on financial analysis"""
+    insights = {
+        'critical': [],
+        'warnings': [],
+        'recommendations': [],
+        'positive': []
+    }
+    
+    # Profitability Analysis
+    profit_margin = (results['pat'] / results['total_annual_revenue'] * 100) if results['total_annual_revenue'] > 0 else 0
+    
+    if profit_margin < 5:
+        insights['critical'].append({
+            'title': 'Critical: Very Low Profit Margin',
+            'message': f"Your net profit margin is only {profit_margin:.1f}%. This is concerning for long-term sustainability.",
+            'detail': f"**Understanding Net Profit Margin (NPM):**\n\n"
+                     f"📊 **Formula:** NPM = (Net Profit After Tax / Total Revenue) × 100\n\n"
+                     f"📈 **Your Numbers:**\n"
+                     f"- Net Profit (PAT): {format_currency(results['pat'])}\n"
+                     f"- Total Revenue: {format_currency(results['total_annual_revenue'])}\n"
+                     f"- NPM: {profit_margin:.2f}%\n\n"
+                     f"🏭 **Industry Benchmarks:**\n"
+                     f"- Minimum Viable: 8-10%\n"
+                     f"- Industry Average: 12-15%\n"
+                     f"- Top Performers: 18-22%\n\n"
+                     f"⚠️ **Why This Matters:**\n"
+                     f"A margin below 5% means you're barely covering costs. Any market fluctuation (paddy price increase, power cost rise, or rice price drop) could push you into losses. Rice mills typically need 10%+ margin to handle seasonal variations and maintain operations sustainably.\n\n"
+                     f"💰 **Financial Impact:**\n"
+                     f"- To reach 10% margin, you need additional profit of {format_currency((0.10 * results['total_annual_revenue']) - results['pat'])}\n"
+                     f"- This equals approximately {((0.10 * results['total_annual_revenue']) - results['pat']) / results['rice_kg_year']:.2f} per kg rice price increase\n"
+                     f"- Or cost reduction of {((0.10 * results['total_annual_revenue']) - results['pat']) / results['total_annual_revenue'] * 100:.1f}% across operations",
+            'action': "**Immediate Actions Required:**\n\n"
+                     "1. **Revenue Enhancement (Quick Wins):**\n"
+                     "   - Increase rice sale price by ₹2-3/kg through branding\n"
+                     "   - Add value: branded packaging can justify 15-20% premium\n"
+                     "   - Target retail/direct sales vs wholesale (better margins)\n"
+                     "   - Explore organic certification (30-40% price premium)\n\n"
+                     "2. **Cost Reduction (Immediate Impact):**\n"
+                     "   - Negotiate paddy prices with farmers (contract farming)\n"
+                     "   - Optimize power consumption (LED lighting, efficient motors)\n"
+                     "   - Reduce wastage in processing\n"
+                     "   - Review manpower deployment efficiency\n\n"
+                     "3. **Operational Excellence:**\n"
+                     "   - Improve recovery rate by 1-2% through better machinery\n"
+                     "   - Maximize by-product sales (bran oil, husk briquettes)\n"
+                     "   - Reduce downtime through preventive maintenance"
+        })
+    elif profit_margin < 10:
+        insights['warnings'].append({
+            'title': 'Low Profit Margin',
+            'message': f"Net profit margin of {profit_margin:.1f}% is below industry average (12-15%).",
+            'detail': f"**Net Profit Margin Analysis:**\n\n"
+                     f"📊 **Your Performance:**\n"
+                     f"- Current NPM: {profit_margin:.2f}%\n"
+                     f"- Industry Average: 12-15%\n"
+                     f"- Gap to Average: {12 - profit_margin:.2f} percentage points\n\n"
+                     f"📈 **Current Profitability:**\n"
+                     f"- Annual PAT: {format_currency(results['pat'])}\n"
+                     f"- Per kg profit: ₹{results['pat'] / results['rice_kg_year']:.2f}\n"
+                     f"- Per tonne profit: ₹{results['pat'] / (results['rice_kg_year']/1000):.0f}\n\n"
+                     f"🎯 **To Reach 12% Margin:**\n"
+                     f"- Target PAT needed: {format_currency(0.12 * results['total_annual_revenue'])}\n"
+                     f"- Additional profit required: {format_currency((0.12 * results['total_annual_revenue']) - results['pat'])}\n"
+                     f"- This requires {((0.12 * results['total_annual_revenue']) - results['pat']) / results['rice_kg_year']:.2f}/kg improvement\n\n"
+                     f"💡 **Competitive Position:**\n"
+                     f"While not critical, your margin leaves little buffer for market volatility. Successful rice mills maintain 12-15% margins to absorb seasonal price fluctuations and invest in growth.",
+            'action': "**Strategic Improvements:**\n\n"
+                     "1. **Premium Product Mix:**\n"
+                     "   - Introduce premium basmati/specialty rice (20-30% higher margin)\n"
+                     "   - Develop branded retail packs\n"
+                     "   - Target institutional clients (hotels, caterers)\n\n"
+                     "2. **Cost Optimization:**\n"
+                     "   - Benchmark costs against top performers\n"
+                     "   - Implement energy audit and efficiency measures\n"
+                     "   - Optimize procurement through bulk buying\n\n"
+                     "3. **By-Product Monetization:**\n"
+                     "   - Maximize bran sales to oil mills\n"
+                     "   - Convert husk to fuel briquettes\n"
+                     "   - Sell broken rice to breweries/snack makers"
+        })
+    elif profit_margin > 15:
+        insights['positive'].append({
+            'title': 'Excellent Profit Margin',
+            'message': f"Your {profit_margin:.1f}% profit margin exceeds industry standards!",
+            'detail': f"**Outstanding Profitability Performance:**\n\n"
+                     f"🌟 **Your Achievement:**\n"
+                     f"- Your NPM: {profit_margin:.2f}%\n"
+                     f"- Industry Average: 12-15%\n"
+                     f"- You're {profit_margin - 13.5:.2f} points above average!\n\n"
+                     f"💰 **Financial Excellence:**\n"
+                     f"- Annual PAT: {format_currency(results['pat'])}\n"
+                     f"- Profit per kg: ₹{results['pat'] / results['rice_kg_year']:.2f}\n"
+                     f"- Profit per tonne: ₹{results['pat'] / (results['rice_kg_year']/1000):.0f}\n\n"
+                     f"📊 **What This Means:**\n"
+                     f"Your margin puts you in the top 20% of rice mills nationally. This indicates excellent operational efficiency, strong pricing power, or superior quality positioning. Such margins provide:\n"
+                     f"- Strong buffer against market volatility\n"
+                     f"- Capacity to invest in growth\n"
+                     f"- Competitive advantage in the market\n\n"
+                     f"🎯 **Value Creation:**\n"
+                     f"With this margin, you're generating {format_currency(results['pat'] - (0.12 * results['total_annual_revenue']))} more profit than average mills!",
+            'action': "**Leverage Your Success:**\n\n"
+                     "1. **Strategic Growth:**\n"
+                     "   - Reinvest in capacity expansion (6-7 TPH upgrade)\n"
+                     "   - Add automated sorting and grading equipment\n"
+                     "   - Invest in modern packaging line for retail market\n\n"
+                     "2. **Market Leadership:**\n"
+                     "   - Build strong brand presence\n"
+                     "   - Expand distribution network\n"
+                     "   - Consider contract manufacturing for brands\n\n"
+                     "3. **Sustainability & Innovation:**\n"
+                     "   - Invest in green energy (solar panels)\n"
+                     "   - Implement quality certifications (ISO, FSSAI)\n"
+                     "   - Develop premium product lines\n\n"
+                     "4. **Financial Prudence:**\n"
+                     "   - Build contingency reserves (6-12 months operating costs)\n"
+                     "   - Consider prepaying high-interest debt\n"
+                     "   - Invest excess in liquid funds"
+        })
+    
+    # Break-even Analysis
+    breakeven_capacity = (results['breakeven_kg'] / results['rice_kg_year'] * 100) if results['rice_kg_year'] > 0 else 0
+    
+    if breakeven_capacity > 80:
+        insights['critical'].append({
+            'title': 'Critical: High Break-even Point',
+            'message': f"You need to operate at {breakeven_capacity:.1f}% capacity to break even. Very risky!",
+            'detail': f"**Break-Even Analysis - Critical Situation:**\n\n"
+                     f"📊 **Break-Even Metrics:**\n"
+                     f"- Break-even capacity: {breakeven_capacity:.1f}%\n"
+                     f"- Break-even production: {results['breakeven_kg']:,.0f} kg/year\n"
+                     f"- Your planned production: {results['rice_kg_year']:,.0f} kg/year\n"
+                     f"- Safety margin: Only {100 - breakeven_capacity:.1f}%\n\n"
+                     f"⚠️ **Understanding Break-Even:**\n"
+                     f"Break-even point is where Total Revenue = Total Costs (you make ₹0 profit). Operating at {breakeven_capacity:.1f}% capacity means:\n"
+                     f"- Fixed costs: {format_currency(results['total_operating_costs'] - (results.get('variable_costs', 0)))}/year (must be paid regardless)\n"
+                     f"- Variable costs: {format_currency(results.get('variable_costs', results['annual_paddy_cost']))}/year (linked to production)\n"
+                     f"- Total revenue at break-even: {format_currency(results['breakeven_kg'] * inputs['sale_price_per_kg'])}\n\n"
+                     f"🚨 **Why This is Critical:**\n"
+                     f"1. **Market Risk:** Any demand reduction >20% = losses\n"
+                     f"2. **Operational Risk:** Even short stoppages hurt profitability\n"
+                     f"3. **Price Risk:** Cannot absorb paddy price increases\n"
+                     f"4. **Cash Flow Risk:** Little margin to service loan EMIs\n\n"
+                     f"📉 **Impact of Capacity Reduction:**\n"
+                     f"- At 75% capacity: Loss of ~{format_currency(0.05 * results['total_annual_revenue'])}\n"
+                     f"- At 70% capacity: Loss of ~{format_currency(0.10 * results['total_annual_revenue'])}\n"
+                     f"- Below 60% capacity: Severe losses, possible default\n\n"
+                     f"💡 **Financial Viability:**\n"
+                     f"Healthy mills operate at 50-60% break-even. Above 70% is risky; above 80% is not recommended for funding.",
+            'action': "**Urgent Restructuring Required:**\n\n"
+                     "1. **Reduce Fixed Costs (Immediate):**\n"
+                     "   - Negotiate lower EMI with longer tenure (reduces monthly burden)\n"
+                     "   - Increase equity to reduce loan amount and interest cost\n"
+                     "   - Consider leasing instead of buying some equipment\n"
+                     "   - Optimize manpower - cross-train workers\n\n"
+                     "2. **Improve Revenue Per Unit:**\n"
+                     "   - Increase sale price by ₹3-5/kg minimum\n"
+                     "   - Focus on value-added products\n"
+                     "   - Secure long-term contracts at guaranteed prices\n\n"
+                     "3. **Enhance Capacity Utilization:**\n"
+                     "   - Line up customers before starting\n"
+                     "   - Consider contract processing for other mills\n"
+                     "   - Increase operating hours/days\n\n"
+                     "4. **Financial Restructuring:**\n"
+                     "   - Extend loan tenure from 10 to 15 years\n"
+                     "   - Seek lower interest rate (PSU banks vs private)\n"
+                     "   - Consider government subsidy schemes\n\n"
+                     "⚠️ **Recommendation:** Delay project until break-even drops below 70%"
+        })
+    elif breakeven_capacity > 60:
+        insights['warnings'].append({
+            'title': 'High Break-even Capacity',
+            'message': f"Break-even at {breakeven_capacity:.1f}% capacity leaves little room for market fluctuations.",
+            'detail': f"**Break-Even Analysis - Caution Advised:**\n\n"
+                     f"📊 **Current Break-Even Position:**\n"
+                     f"- Break-even capacity: {breakeven_capacity:.1f}%\n"
+                     f"- Break-even volume: {results['breakeven_kg']:,.0f} kg/year\n"
+                     f"- Safety margin: {100 - breakeven_capacity:.1f}%\n"
+                     f"- Monthly break-even: {results['breakeven_kg'] / 12:,.0f} kg\n\n"
+                     f"📈 **Cost Structure:**\n"
+                     f"- Fixed costs/year: {format_currency(results['total_operating_costs'] * 0.4)}\n"
+                     f"- Variable costs/year: {format_currency(results['total_operating_costs'] * 0.6)}\n"
+                     f"- Revenue at break-even: {format_currency(results['breakeven_kg'] * inputs['sale_price_per_kg'])}\n\n"
+                     f"⚠️ **Risk Assessment:**\n"
+                     f"Break-even above 60% indicates moderate risk:\n"
+                     f"- Limited flexibility in pricing\n"
+                     f"- Vulnerable to seasonal demand variations\n"
+                     f"- Restricted ability to handle operational issues\n"
+                     f"- Tight cash flow management needed\n\n"
+                     f"🎯 **Industry Comparison:**\n"
+                     f"- Your break-even: {breakeven_capacity:.1f}%\n"
+                     f"- Recommended: 50-60%\n"
+                     f"- Industry average: 55-65%\n"
+                     f"- Best-in-class: 40-50%\n\n"
+                     f"💰 **Profit at Different Capacities:**\n"
+                     f"- At 100% capacity: {format_currency(results['pat'])}\n"
+                     f"- At 80% capacity: ~{format_currency(results['pat'] * 0.6)}\n"
+                     f"- At 70% capacity: ~{format_currency(results['pat'] * 0.3)}\n"
+                     f"- Below {breakeven_capacity:.0f}%: Losses",
+            'action': "**Risk Mitigation Strategies:**\n\n"
+                     "1. **Build Financial Buffer (Critical):**\n"
+                     "   - Maintain working capital for 3-4 months (not 2)\n"
+                     "   - Create contingency reserve of {format_currency(results['total_operating_costs'] * 0.25)}\n"
+                     "   - Keep credit line arranged with bank\n\n"
+                     "2. **Secure Demand (Before Launch):**\n"
+                     "   - Lock in contracts for at least {breakeven_capacity:.0f}% capacity\n"
+                     "   - Sign MoUs with wholesalers/retailers\n"
+                     "   - Arrange advance payment terms\n"
+                     "   - Diversify customer base (avoid single buyer dependency)\n\n"
+                     "3. **Cost Management:**\n"
+                     "   - Negotiate paddy prices with contract farming\n"
+                     "   - Optimize power costs (solar/time-of-day tariff)\n"
+                     "   - Reduce fixed costs where possible\n\n"
+                     "4. **Operational Excellence:**\n"
+                     "   - Maximize capacity utilization from day 1\n"
+                     "   - Implement preventive maintenance\n"
+                     "   - Train workforce for maximum efficiency\n\n"
+                     "5. **Financial Planning:**\n"
+                     "   - Keep personal/promoter reserves for emergencies\n"
+                     "   - Avoid aggressive expansion in first 2 years\n"
+                     "   - Monitor cash flow weekly, not monthly"
+        })
+    else:
+        insights['positive'].append({
+            'title': 'Strong Break-even Position',
+            'message': f"Break-even at only {breakeven_capacity:.1f}% capacity provides good safety margin.",
+            'detail': f"**Excellent Break-Even Performance:**\n\n"
+                     f"🌟 **Your Strong Position:**\n"
+                     f"- Break-even capacity: {breakeven_capacity:.1f}%\n"
+                     f"- Safety margin: {100 - breakeven_capacity:.1f}%\n"
+                     f"- Break-even volume: {results['breakeven_kg']:,.0f} kg/year\n"
+                     f"- Profit zone begins at: {breakeven_capacity:.0f}% capacity\n\n"
+                     f"📊 **Financial Strength:**\n"
+                     f"Your low break-even means:\n"
+                     f"- Can be profitable even at {breakeven_capacity:.0f}% capacity\n"
+                     f"- Strong buffer against market downturns\n"
+                     f"- Flexibility to offer competitive pricing\n"
+                     f"- Room to absorb input cost increases\n\n"
+                     f"💰 **Profit Potential:**\n"
+                     f"- At 100% capacity: {format_currency(results['pat'])}\n"
+                     f"- At 80% capacity: ~{format_currency(results['pat'] * 0.8)}\n"
+                     f"- At 70% capacity: ~{format_currency(results['pat'] * 0.65)}\n"
+                     f"- Even at {breakeven_capacity:.0f}%: Break-even (no loss)\n\n"
+                     f"🎯 **Competitive Advantage:**\n"
+                     f"Your {breakeven_capacity:.1f}% break-even vs industry average 60-65% gives you:\n"
+                     f"- Pricing power in the market\n"
+                     f"- Ability to undercut competitors if needed\n"
+                     f"- Security during seasonal slowdowns\n"
+                     f"- Confidence for lenders/investors\n\n"
+                     f"📈 **What Makes This Possible:**\n"
+                     f"- Efficient cost structure\n"
+                     f"- Good revenue per kg\n"
+                     f"- Balanced fixed vs variable costs\n"
+                     f"- Optimized financing terms",
+            'action': "**Maximize Your Advantage:**\n\n"
+                     "1. **Market Strategy:**\n"
+                     "   - Use pricing flexibility to capture market share\n"
+                     "   - Can offer volume discounts to secure large orders\n"
+                     "   - Build premium brand without fear of losses\n\n"
+                     "2. **Growth Opportunities:**\n"
+                     "   - Strong foundation for capacity expansion\n"
+                     "   - Can add value-added product lines\n"
+                     "   - Consider backward integration (paddy farming)\n\n"
+                     "3. **Financial Optimization:**\n"
+                     "   - Use free cash flow for growth initiatives\n"
+                     "   - Build reserves for future opportunities\n"
+                     "   - Could increase automation investment\n\n"
+                     "4. **Risk Management:**\n"
+                     "   - Even with your buffer, maintain 2-3 month working capital\n"
+                     "   - Don't become complacent - monitor costs monthly\n"
+                     "   - Keep efficiency improvement as ongoing goal"
+        })
+    
+    # Debt-Equity Ratio Analysis
+    debt_equity_ratio = results['loan_amount'] / results['equity_amount'] if results['equity_amount'] > 0 else float('inf')
+    
+    if debt_equity_ratio > 3:
+        insights['warnings'].append({
+            'title': 'High Debt Burden',
+            'message': f"Debt-Equity ratio of {debt_equity_ratio:.2f}:1 is quite high.",
+            'detail': f"**Debt-Equity Ratio Analysis:**\n\n"
+                     f"📊 **Your Capital Structure:**\n"
+                     f"- Total Project Cost: {format_currency(results['total_project_cost'])}\n"
+                     f"- Loan (Debt): {format_currency(results['loan_amount'])} ({results['loan_amount']/results['total_project_cost']*100:.1f}%)\n"
+                     f"- Equity: {format_currency(results['equity_amount'])} ({results['equity_amount']/results['total_project_cost']*100:.1f}%)\n"
+                     f"- D/E Ratio: {debt_equity_ratio:.2f}:1\n\n"
+                     f"📈 **Understanding D/E Ratio:**\n"
+                     f"This ratio shows how much you're borrowing for every rupee of your own money. Your ratio of {debt_equity_ratio:.2f}:1 means:\n"
+                     f"- For every ₹1 of equity, you have ₹{debt_equity_ratio:.2f} of debt\n"
+                     f"- Debt is {debt_equity_ratio * 100:.0f}% of equity\n"
+                     f"- High leverage = high risk but potentially high returns\n\n"
+                     f"⚠️ **Risks of High Leverage:**\n"
+                     f"1. **Interest Burden:** Annual interest = {format_currency(results['loan_amount'] * inputs.get('loan_interest_rate', 12)/100)}\n"
+                     f"2. **EMI Obligation:** Monthly EMI = {format_currency(results['emi'])}\n"
+                     f"3. **Cash Flow Pressure:** Must service debt regardless of profits\n"
+                     f"4. **Bank Scrutiny:** Lenders may flag ratio >3 as high risk\n"
+                     f"5. **Limited Flexibility:** Difficult to raise more funds\n\n"
+                     f"🏦 **Industry Standards:**\n"
+                     f"- Your ratio: {debt_equity_ratio:.2f}:1\n"
+                     f"- Ideal range: 1.5:1 to 2.5:1\n"
+                     f"- Maximum acceptable: 3:1\n"
+                     f"- Your deviation: {debt_equity_ratio - 2.5:.2f} points above recommended\n\n"
+                     f"💰 **Impact on Returns:**\n"
+                     f"While high debt increases risk, ROE (Return on Equity) = {(results['pat'] / results['equity_amount'] * 100):.1f}% is boosted by leverage.",
+            'action': "**De-leveraging Strategies:**\n\n"
+                     "1. **Increase Equity (Recommended):**\n"
+                     f"   - Bring D/E to 2:1 by adding equity of {format_currency((results['loan_amount']/2) - results['equity_amount'])}\n"
+                     "   - Consider bringing in partner/investor\n"
+                     "   - Explore promoter's additional contribution\n\n"
+                     "2. **Reduce Project Cost:**\n"
+                     "   - Phase implementation (start smaller, expand later)\n"
+                     "   - Lease equipment instead of buying\n"
+                     "   - Buy refurbished machinery where feasible\n\n"
+                     "3. **Alternate Financing:**\n"
+                     "   - Apply for PMFME (Prime Minister Formalisation of Micro food processing Enterprises) subsidy\n"
+                     "   - Check state government food processing schemes\n"
+                     "   - Explore NABARD financing (better terms)\n\n"
+                     "4. **If Proceeding as-is:**\n"
+                     "   - Maintain higher working capital reserve\n"
+                     "   - Secure advance customer payments\n"
+                     "   - Have personal financial backup for 6 months EMI"
+        })
+    elif debt_equity_ratio < 1:
+        insights['recommendations'].append({
+            'title': 'Conservative Financing',
+            'message': f"Debt-Equity ratio of {debt_equity_ratio:.2f}:1 is very conservative.",
+            'detail': f"**Conservative Capital Structure Analysis:**\n\n"
+                     f"📊 **Your Financing:**\n"
+                     f"- Total Project: {format_currency(results['total_project_cost'])}\n"
+                     f"- Equity: {format_currency(results['equity_amount'])} ({results['equity_amount']/results['total_project_cost']*100:.1f}%)\n"
+                     f"- Loan: {format_currency(results['loan_amount'])} ({results['loan_amount']/results['total_project_cost']*100:.1f}%)\n"
+                     f"- D/E Ratio: {debt_equity_ratio:.2f}:1 (Equity-heavy)\n\n"
+                     f"💡 **What This Means:**\n"
+                     f"You're using more of your own money than borrowed funds. This means:\n"
+                     f"- Very low financial risk\n"
+                     f"- Lower interest payments\n"
+                     f"- Easy loan approval\n"
+                     f"- But: Potentially lower ROE\n\n"
+                     f"📈 **Return on Equity Impact:**\n"
+                     f"- Current ROE: {(results['pat'] / results['equity_amount'] * 100):.1f}%\n"
+                     f"- With 2:1 D/E ratio, ROE could be: ~{(results['pat'] / (results['equity_amount']*0.6) * 100):.1f}%\n"
+                     f"- Opportunity cost of blocking extra capital\n\n"
+                     f"🎯 **Industry Practice:**\n"
+                     f"- Your ratio: {debt_equity_ratio:.2f}:1\n"
+                     f"- Typical ratio: 1.5:1 to 2.5:1\n"
+                     f"- Banks often fund 60-75% (1.5:1 to 3:1 D/E)\n\n"
+                     f"💰 **Financial Optimization:**\n"
+                     f"You have {format_currency(results['equity_amount'] - (results['total_project_cost']/2))} excess equity that could be:\n"
+                     f"- Freed for other investments\n"
+                     f"- Used for working capital optimization\n"
+                     f"- Deployed in expansion later",
+            'action': "**Optimize Capital Structure:**\n\n"
+                     "1. **Leverage Opportunity (Optional):**\n"
+                     f"   - Could increase loan to {format_currency(results['total_project_cost'] * 0.65)} (2:1 D/E)\n"
+                     f"   - Would free up equity: {format_currency(results['equity_amount'] - (results['total_project_cost'] * 0.35))}\n"
+                     "   - At 12% interest, cost is tax-deductible\n\n"
+                     "2. **Benefits of Maintaining Conservative Approach:**\n"
+                     "   - Peace of mind - no debt stress\n"
+                     "   - Flexibility in operations\n"
+                     "   - Can take risks in market strategy\n"
+                     "   - Easy to get additional credit if needed\n\n"
+                     "3. **Strategic Deployment:**\n"
+                     "   - Keep excess funds in liquid investments\n"
+                     "   - Plan for capacity expansion with available equity\n"
+                     "   - Use freed capital for marketing/branding\n\n"
+                     "4. **Best Practice:**\n"
+                     "   - If comfortable with current structure, maintain it\n"
+                     "   - If want to optimize ROE, consider moderate increase in debt\n"
+                     "   - Assess tax benefits of interest vs equity returns"
+        })
+    else:
+        insights['positive'].append({
+            'title': 'Balanced Financing',
+            'message': f"Debt-Equity ratio of {debt_equity_ratio:.2f}:1 is well-balanced.",
+            'detail': f"**Optimal Capital Structure:**\n\n"
+                     f"🌟 **Your Balanced Financing:**\n"
+                     f"- Total Project: {format_currency(results['total_project_cost'])}\n"
+                     f"- Equity: {format_currency(results['equity_amount'])} ({results['equity_amount']/results['total_project_cost']*100:.1f}%)\n"
+                     f"- Loan: {format_currency(results['loan_amount'])} ({results['loan_amount']/results['total_project_cost']*100:.1f}%)\n"
+                     f"- D/E Ratio: {debt_equity_ratio:.2f}:1 ✓ Optimal\n\n"
+                     f"📊 **Why This is Ideal:**\n"
+                     f"Your ratio falls within the sweet spot (1:1 to 2.5:1), which means:\n"
+                     f"- Moderate financial risk\n"
+                     f"- Good leverage for ROE\n"
+                     f"- Acceptable to all lenders\n"
+                     f"- Tax benefits from interest\n"
+                     f"- Preserves equity for emergencies\n\n"
+                     f"💰 **Financial Efficiency:**\n"
+                     f"- ROE: {(results['pat'] / results['equity_amount'] * 100):.1f}%\n"
+                     f"- Interest cost: {format_currency(results['loan_amount'] * inputs.get('loan_interest_rate', 12)/100)}/year\n"
+                     f"- Tax shield on interest: ~{format_currency(results['loan_amount'] * inputs.get('loan_interest_rate', 12)/100 * 0.25)}\n"
+                     f"- Net interest cost: {format_currency(results['loan_amount'] * inputs.get('loan_interest_rate', 12)/100 * 0.75)}/year\n\n"
+                     f"🎯 **Industry Comparison:**\n"
+                     f"- Your D/E: {debt_equity_ratio:.2f}:1\n"
+                     f"- Industry range: 1.5:1 to 2.5:1\n"
+                     f"- Your position: Right in the middle ✓\n"
+                     f"- Lender preference: Yes ✓\n\n"
+                     f"📈 **Strategic Advantage:**\n"
+                     f"This structure gives you:\n"
+                     f"- Room to borrow more if needed\n"
+                     f"- Strong credit profile\n"
+                     f"- Flexibility for expansion",
+            'action': "**Maintain & Leverage This Strength:**\n\n"
+                     "1. **Preserve the Balance:**\n"
+                     "   - Don't disturb this optimal structure\n"
+                     "   - Future expansions: maintain similar ratio\n"
+                     "   - Regular principal payments improve ratio over time\n\n"
+                     "2. **Use Credit Wisely:**\n"
+                     "   - Your strong D/E opens doors for:\n"
+                     "     * Working capital limits\n"
+                     "     * Equipment upgrade loans\n"
+                     "     * Expansion financing\n"
+                     "   - Banks will view you favorably\n\n"
+                     "3. **Optimize Tax Benefits:**\n"
+                     "   - Interest paid is tax-deductible\n"
+                     f"   - Annual tax saving: ~{format_currency(results['loan_amount'] * inputs.get('loan_interest_rate', 12)/100 * 0.25)}\n"
+                     "   - Effective interest rate post-tax: lower\n\n"
+                     "4. **Financial Discipline:**\n"
+                     "   - Make EMI payments on time (builds credit)\n"
+                     "   - Consider prepayment in years 4-5 when cash flows improve\n"
+                     "   - Keep equity buffer for opportunities"
+        })
+    
+    # Cash Flow Analysis
+    annual_cash_flow = results['annual_cash_flow']
+    monthly_cash_flow = annual_cash_flow / 12
+    
+    if annual_cash_flow < 0:
+        insights['critical'].append({
+            'title': 'Negative Cash Flow',
+            'message': f"Annual cash flow is negative at {format_currency(annual_cash_flow)}.",
+            'detail': f"**Critical Cash Flow Problem:**\n\n"
+                     f"⚠️ **Your Cash Flow Situation:**\n"
+                     f"- Annual Cash Flow: {format_currency(annual_cash_flow)} (NEGATIVE)\n"
+                     f"- Monthly Average: {format_currency(monthly_cash_flow)}\n"
+                     f"- Monthly EMI: {format_currency(results['emi'])}\n"
+                     f"- Monthly Deficit: {format_currency(monthly_cash_flow - results['emi'])}\n\n"
+                     f"📊 **Understanding the Problem:**\n"
+                     f"Cash Flow = PAT + Depreciation + Interest - EMI Principal\n"
+                     f"- Your PAT: {format_currency(results['pat'])}\n"
+                     f"- Add: Depreciation: {format_currency(results.get('depreciation', 0))}\n"
+                     f"- Less: Loan Principal: {format_currency(results['emi'] * 12 - results['loan_amount'] * inputs.get('loan_interest_rate', 12)/100)}\n"
+                     f"= Net Cash Flow: {format_currency(annual_cash_flow)}\n\n"
+                     f"🚨 **Why This is Critical:**\n"
+                     f"Negative cash flow means you're spending more cash than you're generating. You'll need to:\n"
+                     f"1. Use working capital every month\n"
+                     f"2. Deplete reserves quickly\n"
+                     f"3. Risk EMI defaults\n"
+                     f"4. Cannot invest in growth\n\n"
+                     f"💰 **12-Month Cash Projection:**\n"
+                     f"- Working capital at start: {format_currency(results['working_capital'])}\n"
+                     f"- Monthly burn: {format_currency(abs(monthly_cash_flow))}\n"
+                     f"- Reserves depleted in: {results['working_capital'] / abs(monthly_cash_flow):.1f} months\n"
+                     f"- Additional capital needed: {format_currency(abs(annual_cash_flow))}",
+            'action': "**Emergency Actions Required:**\n\n"
+                     "1. **Restructure Loan (Urgent):**\n"
+                     f"   - Extend tenure from {inputs.get('loan_tenure', 10)} to 15 years\n"
+                     "   - This reduces EMI and improves cash flow\n"
+                     f"   - New EMI will be ~{format_currency(results['emi'] * 0.75)}\n"
+                     f"   - Cash flow improvement: {format_currency((results['emi'] - results['emi'] * 0.75) * 12)}/year\n\n"
+                     "2. **Increase Working Capital:**\n"
+                     f"   - Current: {format_currency(results['working_capital'])}\n"
+                     f"   - Recommended: {format_currency(results['working_capital'] + abs(annual_cash_flow) * 2)}\n"
+                     "   - Covers 24 months of deficit\n\n"
+                     "3. **Improve Profitability Immediately:**\n"
+                     "   - Must increase PAT by at least {format_currency(abs(annual_cash_flow))}\n"
+                     "   - Through price increase or cost reduction\n\n"
+                     "4. **Alternative: Delay Project:**\n"
+                     "   - Reconsider project viability\n"
+                     "   - Rework numbers until cash flow positive\n"
+                     "   - Secure advance payments from customers"
+        })
+    elif monthly_cash_flow < results['emi']:
+        insights['warnings'].append({
+            'title': 'Tight Cash Flow',
+            'message': "Monthly cash flow is less than EMI payment. Working capital may be strained.",
+            'detail': f"**Cash Flow Pressure Analysis:**\n\n"
+                     f"📊 **Your Monthly Cash Position:**\n"
+                     f"- Monthly Cash Flow: {format_currency(monthly_cash_flow)}\n"
+                     f"- Monthly EMI: {format_currency(results['emi'])}\n"
+                     f"- Monthly Gap: {format_currency(monthly_cash_flow - results['emi'])}\n"
+                     f"- Annual Impact: {format_currency((monthly_cash_flow - results['emi']) * 12)}\n\n"
+                     f"📈 **Annual Cash Flow Breakdown:**\n"
+                     f"- PAT (Net Profit): {format_currency(results['pat'])}\n"
+                     f"- Add: Depreciation (non-cash): {format_currency(results.get('depreciation', 0))}\n"
+                     f"- Less: Loan Principal Payment: {format_currency((results['emi'] * 12) - (results['loan_amount'] * inputs.get('loan_interest_rate', 12)/100))}\n"
+                     f"- Net Annual Cash Flow: {format_currency(annual_cash_flow)}\n\n"
+                     f"⚠️ **The Challenge:**\n"
+                     f"While annual cash flow is positive ({format_currency(annual_cash_flow)}), your monthly EMI exceeds monthly cash generation. This means:\n"
+                     f"- Need to dip into working capital some months\n"
+                     f"- Seasonal variations can cause cash crunches\n"
+                     f"- Limited room for unexpected expenses\n\n"
+                     f"💡 **Working Capital Runway:**\n"
+                     f"- Available working capital: {format_currency(results['working_capital'])}\n"
+                     f"- Monthly strain: {format_currency(results['emi'] - monthly_cash_flow)}\n"
+                     f"- Buffer lasts: {results['working_capital'] / (results['emi'] - monthly_cash_flow):.1f} months",
+            'action': "**Cash Management Strategies:**\n\n"
+                     "1. **Optimize Working Capital (Essential):**\n"
+                     f"   - Increase from {format_currency(results['working_capital'])} to {format_currency(results['working_capital'] * 1.5)}\n"
+                     "   - Provides 50% more buffer\n"
+                     "   - Covers 3-4 months of operations comfortably\n\n"
+                     "2. **Improve Payment Terms:**\n"
+                     "   - Negotiate 15-day advance from customers\n"
+                     "   - Request 30-day credit from paddy suppliers\n"
+                     "   - This improves cash cycle by 45 days\n\n"
+                     "3. **Consider EMI Restructuring:**\n"
+                     "   - Step-up EMI: Lower for first 2 years\n"
+                     "   - Moratorium on principal for 6 months\n"
+                     "   - Seasonal EMI structure (lower in lean months)\n\n"
+                     "4. **Revenue Acceleration:**\n"
+                     "   - Offer small discount for advance payment\n"
+                     "   - Reduce credit period from 30 to 15 days\n"
+                     "   - Diversify to retail (immediate cash)\n\n"
+                     "5. **Monitor Closely:**\n"
+                     "   - Track cash position daily\n"
+                     "   - Maintain cash reserve for EMI\n"
+                     "   - Setup cash flow alerts"
+        })
+    else:
+        insights['positive'].append({
+            'title': 'Healthy Cash Flow',
+            'message': f"Positive annual cash flow of {format_currency(annual_cash_flow)}.",
+            'detail': f"**Strong Cash Flow Position:**\n\n"
+                     f"💰 **Your Cash Generation:**\n"
+                     f"- Annual Cash Flow: {format_currency(annual_cash_flow)} (POSITIVE)\n"
+                     f"- Monthly Average: {format_currency(monthly_cash_flow)}\n"
+                     f"- Monthly EMI: {format_currency(results['emi'])}\n"
+                     f"- Monthly Surplus: {format_currency(monthly_cash_flow - results['emi'])}\n\n"
+                     f"📊 **Cash Flow Composition:**\n"
+                     f"- PAT (Net Profit): {format_currency(results['pat'])}\n"
+                     f"- Add: Depreciation: {format_currency(results.get('depreciation', 0))}\n"
+                     f"- Less: Principal Payment: {format_currency((results['emi'] * 12) - (results['loan_amount'] * inputs.get('loan_interest_rate', 12)/100))}\n"
+                     f"- Net Cash Flow: {format_currency(annual_cash_flow)}\n\n"
+                     f"🌟 **Why This Matters:**\n"
+                     f"Positive cash flow means:\n"
+                     f"- Can comfortably service debt\n"
+                     f"- Generate {format_currency(monthly_cash_flow - results['emi'])}/month surplus\n"
+                     f"- Build reserves for growth\n"
+                     f"- Handle unexpected expenses\n"
+                     f"- No working capital strain\n\n"
+                     f"📈 **Annual Accumulation:**\n"
+                     f"After all expenses and EMI:\n"
+                     f"- Year 1 surplus: {format_currency(annual_cash_flow)}\n"
+                     f"- Year 2 accumulated: {format_currency(annual_cash_flow * 2)}\n"
+                     f"- Year 3 accumulated: {format_currency(annual_cash_flow * 3)}\n"
+                     f"- 5-Year total: {format_currency(annual_cash_flow * 5)}\n\n"
+                     f"🎯 **Cash Flow Coverage Ratio:**\n"
+                     f"Your ratio: {(monthly_cash_flow / results['emi']):.2f}x\n"
+                     f"(Healthy is >1.2x, Excellent is >1.5x)",
+            'action': "**Optimize Your Strong Cash Position:**\n\n"
+                     "1. **Strategic Reserves:**\n"
+                     f"   - Build emergency fund: {format_currency(results['total_operating_costs'] / 2)}\n"
+                     "   - Covers 6 months operations\n"
+                     "   - Keep in liquid funds earning 6-7%\n\n"
+                     "2. **Growth Investment:**\n"
+                     f"   - Surplus in 3 years: {format_currency(annual_cash_flow * 3)}\n"
+                     "   - Enough for capacity expansion\n"
+                     "   - Or technology upgrades\n"
+                     "   - Or market expansion\n\n"
+                     "3. **Debt Management:**\n"
+                     "   - Consider prepayment after year 3\n"
+                     "   - Reduces interest burden\n"
+                     f"   - Save up to {format_currency(results['loan_amount'] * 0.12 * 3)} in interest\n\n"
+                     "4. **Working Capital Optimization:**\n"
+                     "   - Excess cash can reduce working capital needs\n"
+                     "   - Invest in income-generating assets\n"
+                     "   - Provide trade credit to customers\n\n"
+                     "5. **Distribution Strategy:**\n"
+                     "   - Year 1-2: Retain all cash (build reserves)\n"
+                     "   - Year 3+: Can consider dividend to promoters\n"
+                     "   - Maintain 2:1 retention vs distribution ratio"
+        })
+    
+    # Working Capital Analysis
+    working_capital_months = (results['working_capital'] / results['total_operating_costs'] * 12) if results['total_operating_costs'] > 0 else 0
+    
+    if working_capital_months < 1:
+        insights['warnings'].append({
+            'title': 'Insufficient Working Capital',
+            'message': f"Working capital covers only {working_capital_months:.1f} months of operations.",
+            'action': "Increase working capital to at least 2-3 months of operating expenses for safety."
+        })
+    elif working_capital_months > 4:
+        insights['recommendations'].append({
+            'title': 'Excess Working Capital',
+            'message': f"Working capital covers {working_capital_months:.1f} months - may be excessive.",
+            'action': "Consider investing excess funds in short-term instruments or reducing initial capital."
+        })
+    
+    # Recovery Rate Analysis
+    recovery_rate = inputs['recovery_rate']
+    
+    if recovery_rate < 62:
+        insights['warnings'].append({
+            'title': 'Below Average Recovery Rate',
+            'message': f"Recovery rate of {recovery_rate}% is below industry standard (65-68%).",
+            'action': "Invest in better machinery, training, or quality paddy procurement to improve recovery."
+        })
+    elif recovery_rate > 68:
+        insights['positive'].append({
+            'title': 'Excellent Recovery Rate',
+            'message': f"Recovery rate of {recovery_rate}% is excellent!",
+            'action': "This competitive advantage should be maintained through regular maintenance and quality control."
+        })
+    
+    # Operating Hours Analysis
+    hours_per_day = inputs['hours_per_day']
+    
+    if hours_per_day < 8:
+        insights['recommendations'].append({
+            'title': 'Underutilized Capacity',
+            'message': f"Operating only {hours_per_day} hours/day means unused capacity.",
+            'action': "Consider increasing operating hours to spread fixed costs and improve profitability."
+        })
+    elif hours_per_day > 16:
+        insights['warnings'].append({
+            'title': 'Intensive Operations',
+            'message': f"Operating {hours_per_day} hours/day may lead to higher maintenance costs.",
+            'action': "Ensure adequate maintenance budget and schedule regular equipment inspections."
+        })
+    
+    # ROI Analysis (5-year perspective)
+    total_5yr_profit = sum([year['PAT'] for year in results['yearly_data']])
+    roi_5yr = (total_5yr_profit / results['total_project_cost'] * 100) if results['total_project_cost'] > 0 else 0
+    
+    if roi_5yr < 50:
+        insights['warnings'].append({
+            'title': 'Low 5-Year ROI',
+            'message': f"5-year ROI of {roi_5yr:.1f}% is below expectations (typically 80-120%).",
+            'detail': f"**Return on Investment Analysis:**\n\n"
+                     f"📊 **Your ROI Performance:**\n"
+                     f"- 5-Year Total PAT: {format_currency(total_5yr_profit)}\n"
+                     f"- Total Investment: {format_currency(results['total_project_cost'])}\n"
+                     f"- 5-Year ROI: {roi_5yr:.1f}%\n"
+                     f"- Annual Average ROI: {roi_5yr/5:.1f}%\n\n"
+                     f"📈 **ROI Calculation:**\n"
+                     f"ROI = (Total Profit / Total Investment) × 100\n"
+                     f"ROI = ({format_currency(total_5yr_profit)} / {format_currency(results['total_project_cost'])}) × 100\n"
+                     f"ROI = {roi_5yr:.1f}%\n\n"
+                     f"⚠️ **Industry Comparison:**\n"
+                     f"- Your 5-yr ROI: {roi_5yr:.1f}%\n"
+                     f"- Expected range: 80-120%\n"
+                     f"- Gap: {80 - roi_5yr:.1f} percentage points below minimum\n"
+                     f"- Minimum acceptable: 60%\n\n"
+                     f"💰 **Year-wise Profit Breakdown:**\n"
+                     + "\n".join([f"- Year {i+1}: {format_currency(year['PAT'])}" for i, year in enumerate(results['yearly_data'])]) + "\n\n"
+                     f"🎯 **To Achieve 80% ROI:**\n"
+                     f"- Total profit needed: {format_currency(results['total_project_cost'] * 0.80)}\n"
+                     f"- Current projection: {format_currency(total_5yr_profit)}\n"
+                     f"- Gap: {format_currency((results['total_project_cost'] * 0.80) - total_5yr_profit)}\n"
+                     f"- Requires {((results['total_project_cost'] * 0.80) - total_5yr_profit) / 5 / results['rice_kg_year']:.2f}/kg improvement",
+            'action': "**Improve ROI Strategies:**\n\n"
+                     "1. **Revenue Enhancement:**\n"
+                     "   - Increase sale price by ₹2-3/kg\n"
+                     f"   - Impact: Additional {format_currency(results['rice_kg_year'] * 2.5 * 5)} over 5 years\n"
+                     "   - Or improve capacity utilization by 10%\n\n"
+                     "2. **Cost Reduction:**\n"
+                     "   - Reduce operating costs by 5-7%\n"
+                     f"   - Saves {format_currency(results['total_operating_costs'] * 0.06 * 5)} over 5 years\n"
+                     "   - Focus on power, paddy procurement costs\n\n"
+                     "3. **Financing Optimization:**\n"
+                     "   - Lower interest rate by 1-2%\n"
+                     "   - Longer tenure reduces annual burden\n"
+                     "   - Improves profitability significantly\n\n"
+                     "4. **Operational Excellence:**\n"
+                     "   - Increase recovery rate by 1%\n"
+                     "   - Better by-product monetization\n"
+                     "   - Reduce wastage and downtime\n\n"
+                     "5. **Strategic Review:**\n"
+                     "   - If ROI stays below 60%, reconsider project\n"
+                     "   - Compare with alternative investments\n"
+                     "   - Fixed deposits give 7-8% with zero risk"
+        })
+    elif roi_5yr > 100:
+        insights['positive'].append({
+            'title': 'Strong 5-Year ROI',
+            'message': f"5-year ROI of {roi_5yr:.1f}% indicates excellent returns!",
+            'detail': f"**Outstanding ROI Performance:**\n\n"
+                     f"🌟 **Your Investment Returns:**\n"
+                     f"- Total Investment: {format_currency(results['total_project_cost'])}\n"
+                     f"- 5-Year PAT: {format_currency(total_5yr_profit)}\n"
+                     f"- 5-Year ROI: {roi_5yr:.1f}%\n"
+                     f"- Annual Average ROI: {roi_5yr/5:.1f}%\n\n"
+                     f"📊 **What This Means:**\n"
+                     f"Your {roi_5yr:.1f}% ROI means:\n"
+                     f"- You'll earn {format_currency(total_5yr_profit)} profit on {format_currency(results['total_project_cost'])} investment\n"
+                     f"- More than doubling your money in 5 years!\n"
+                     f"- Average annual return: {roi_5yr/5:.1f}% (vs FD ~7%)\n"
+                     f"- Exceptional business opportunity\n\n"
+                     f"💰 **Year-wise Profit Growth:**\n"
+                     + "\n".join([f"- Year {i+1}: {format_currency(year['PAT'])} (Cumulative: {format_currency(sum([results['yearly_data'][j]['PAT'] for j in range(i+1)]))})" for i, year in enumerate(results['yearly_data'])]) + "\n\n"
+                     f"🎯 **Comparison with Alternatives:**\n"
+                     f"If you invested {format_currency(results['total_project_cost'])} elsewhere:\n"
+                     f"- Fixed Deposit @7%: {format_currency(results['total_project_cost'] * 0.07 * 5)}\n"
+                     f"- Stock Market @12%: {format_currency(results['total_project_cost'] * 0.12 * 5)}\n"
+                     f"- Your Rice Mill: {format_currency(total_5yr_profit)}\n"
+                     f"- Your advantage: {format_currency(total_5yr_profit - (results['total_project_cost'] * 0.12 * 5))} more than stocks!\n\n"
+                     f"📈 **ROE (Return on Equity):**\n"
+                     f"Even better news - ROE focuses on your equity:\n"
+                     f"- Your equity: {format_currency(results['equity_amount'])}\n"
+                     f"- 5-Year profit: {format_currency(total_5yr_profit)}\n"
+                     f"- ROE: {(total_5yr_profit / results['equity_amount'] * 100):.1f}%!",
+            'action': "**Maximize This Exceptional Opportunity:**\n\n"
+                     "1. **Scale Up Strategy:**\n"
+                     f"   - With such strong ROI, consider phased expansion\n"
+                     f"   - Year 3-4: Add 2-3 TPH capacity\n"
+                     f"   - Use retained profits for growth\n\n"
+                     "2. **Risk Mitigation (Despite Good ROI):**\n"
+                     "   - Don't get complacent\n"
+                     "   - Market conditions can change\n"
+                     "   - Maintain quality and efficiency\n"
+                     "   - Build contingency reserves\n\n"
+                     "3. **Value Creation:**\n"
+                     f"   - Your business creating {format_currency(total_5yr_profit/5)}/year value\n"
+                     "   - Can attract investors/buyers at premium\n"
+                     "   - Consider brand building for exit options\n\n"
+                     "4. **Financial Prudence:**\n"
+                     "   - Reinvest 60-70% of profits\n"
+                     "   - Maintain cash reserves\n"
+                     "   - Prepay expensive debt\n"
+                     "   - Diversify after achieving stability\n\n"
+                     "5. **Proceed with Confidence:**\n"
+                     "   - Your numbers are solid\n"
+                     "   - ROI >100% is exceptional\n"
+                     "   - Execute well and monitor closely"
+        })
+    
+    # Payback Period Estimation
+    cumulative_5yr = results['yearly_data'][-1]['Cumulative Cash']
+    if cumulative_5yr > results['equity_amount']:
+        for i, year_data in enumerate(results['yearly_data'], 1):
+            if year_data['Cumulative Cash'] >= results['equity_amount']:
+                insights['positive'].append({
+                    'title': f'Equity Payback in Year {i}',
+                    'message': f"Your equity investment will be recovered in approximately {i} years.",
+                    'action': "Quick payback period indicates a financially sound project."
+                })
+                break
+    else:
+        insights['warnings'].append({
+            'title': 'Long Payback Period',
+            'message': "Equity may take more than 5 years to recover fully.",
+            'action': "Consider this long-term commitment and ensure adequate financial cushion."
+        })
+    
+    # Price Sensitivity Analysis
+    price_per_kg = inputs['sale_price_per_kg']
+    paddy_price = inputs.get('paddy_price_per_quintal', 2000)
+    
+    if price_per_kg < 30:
+        insights['warnings'].append({
+            'title': 'Low Sale Price',
+            'message': f"Rice sale price of ₹{price_per_kg}/kg is on the lower end.",
+            'action': "Explore value addition (branding, packaging) or premium varieties for better margins."
+        })
+    
+    # Cost Structure Analysis
+    raw_material_percent = (results['annual_paddy_cost'] / results['total_annual_revenue'] * 100)
+    
+    if raw_material_percent > 70:
+        insights['warnings'].append({
+            'title': 'High Raw Material Cost',
+            'message': f"Raw material is {raw_material_percent:.1f}% of revenue - very high!",
+            'action': "Negotiate better paddy prices, consider contract farming, or increase sale prices."
+        })
+    elif raw_material_percent < 50:
+        insights['positive'].append({
+            'title': 'Efficient Raw Material Management',
+            'message': f"Raw material at {raw_material_percent:.1f}% of revenue shows good cost control.",
+            'action': "Maintain this efficiency through strategic procurement and inventory management."
+        })
+    
+    # Manpower Efficiency
+    revenue_per_employee = results['total_annual_revenue'] / (
+        1 + 1 + inputs.get('num_skilled_workers', 6) + inputs.get('num_unskilled_workers', 8) + 1
+    )
+    
+    if revenue_per_employee < 1000000:
+        insights['recommendations'].append({
+            'title': 'Review Manpower Productivity',
+            'message': f"Revenue per employee is {format_currency(revenue_per_employee)}/year.",
+            'action': "Consider automation, training programs, or workflow optimization to improve productivity."
+        })
+    
+    # Seasonal Risk
+    days_per_month = inputs['days_per_month']
+    if days_per_month < 24:
+        insights['recommendations'].append({
+            'title': 'Seasonal Operations',
+            'message': f"Operating {days_per_month} days/month suggests seasonal business.",
+            'action': "Plan for adequate working capital during off-season and diversify product range if possible."
+        })
+    
+    return insights
+
+
 def calculate_comprehensive_financials(inputs):
     """Calculate all financial metrics with comprehensive details"""
     
@@ -48,7 +844,7 @@ def calculate_comprehensive_financials(inputs):
         annual_loan_payment = 0
     
     # ===== PRODUCTION PARAMETERS =====
-    tph = 3.0  # tonnes per hour
+    tph = 5.0  # tonnes per hour
     hours_per_day = inputs["hours_per_day"]
     days_per_month = inputs["days_per_month"]
     working_days_per_year = days_per_month * 12
@@ -466,54 +1262,415 @@ def create_projection_chart(yearly_data):
 
 def main():
     st.set_page_config(
-        page_title="3 TPH Rice Mill - Comprehensive Financial Plan",
+        page_title="🌾 5 TPH Rice Mill - Nature's Bounty Financial Dashboard",
         page_icon="🌾",
         layout="wide",
         initial_sidebar_state="expanded"
     )
 
-    # Custom CSS
+    # Enhanced Nature-Inspired Custom CSS
     st.markdown("""
         <style>
-        .main-header {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #1f77b4;
-            text-align: center;
-            margin-bottom: 0.5rem;
+        /* Import Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Quicksand:wght@400;500;600;700&display=swap');
+        
+        /* Global Styles */
+        .stApp {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8f5e9 100%);
+            font-family: 'Poppins', sans-serif;
         }
+        
+        /* Main Header with Rice Theme */
+        .main-header {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #2e7d32 0%, #558b2f 50%, #827717 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 0;
+            padding: 1rem;
+            font-family: 'Quicksand', sans-serif;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: fadeInDown 1s ease-in;
+        }
+        
         .sub-header {
-            font-size: 1.2rem;
-            color: #666;
+            font-size: 1.3rem;
+            color: #558b2f;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-weight: 500;
+            font-family: 'Quicksand', sans-serif;
+            animation: fadeInUp 1.2s ease-in;
+        }
+        
+        .tagline {
+            font-size: 1rem;
+            color: #689f38;
             text-align: center;
             margin-bottom: 2rem;
+            font-style: italic;
+            font-weight: 300;
+            animation: fadeIn 1.5s ease-in;
         }
-        .section-header {
-            background-color: #f0f2f6;
-            padding: 0.5rem 1rem;
-            border-left: 4px solid #1f77b4;
+        
+        /* Rice Grain Decorative Elements */
+        .rice-decoration {
+            text-align: center;
+            font-size: 2rem;
             margin: 1rem 0;
+            letter-spacing: 10px;
+            opacity: 0.6;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* Nature-Inspired Cards */
+        .metric-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f1f8e9 100%);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border-left: 5px solid #7cb342;
+            box-shadow: 0 4px 15px rgba(124, 179, 66, 0.2);
+            margin: 1rem 0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(124, 179, 66, 0.3);
+        }
+        
+        /* Section Headers with Natural Feel */
+        .section-header {
+            background: linear-gradient(90deg, #c5e1a5 0%, #dcedc8 100%);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            border-left: 6px solid #558b2f;
+            margin: 2rem 0 1rem 0;
             font-weight: 600;
+            font-size: 1.4rem;
+            color: #33691e;
+            box-shadow: 0 2px 10px rgba(85, 139, 47, 0.15);
+            font-family: 'Quicksand', sans-serif;
+        }
+        
+        /* Sidebar Styling */
+        section[data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #f1f8e9 0%, #dcedc8 100%);
+            border-right: 3px solid #aed581;
+        }
+        
+        section[data-testid="stSidebar"] .stMarkdown h2,
+        section[data-testid="stSidebar"] .stMarkdown h3 {
+            color: #33691e;
+            font-family: 'Quicksand', sans-serif;
+        }
+        
+        /* Expander Styling */
+        .streamlit-expanderHeader {
+            background: linear-gradient(90deg, #c5e1a5 0%, #e8f5e9 100%);
+            border-radius: 8px;
+            border-left: 4px solid #7cb342;
+            font-weight: 600;
+            color: #2e7d32;
+            padding: 0.5rem 1rem;
+        }
+        
+        .streamlit-expanderHeader:hover {
+            background: linear-gradient(90deg, #aed581 0%, #c5e1a5 100%);
+        }
+        
+        /* Buttons with Nature Theme */
+        .stButton > button {
+            background: linear-gradient(135deg, #66bb6a 0%, #4caf50 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 0.6rem 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .stButton > button:hover {
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        /* Tabs Styling */
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 8px;
+            background-color: transparent;
+        }
+        
+        .stTabs [data-baseweb="tab"] {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+            border-radius: 10px 10px 0 0;
+            color: #2e7d32;
+            font-weight: 600;
+            padding: 0.8rem 1.5rem;
+            border: 2px solid #c5e1a5;
+            border-bottom: none;
+            font-family: 'Quicksand', sans-serif;
+        }
+        
+        .stTabs [data-baseweb="tab"]:hover {
+            background: linear-gradient(135deg, #c5e1a5 0%, #dcedc8 100%);
+        }
+        
+        .stTabs [aria-selected="true"] {
+            background: linear-gradient(135deg, #7cb342 0%, #9ccc65 100%);
+            color: white;
+            border-color: #558b2f;
+        }
+        
+        /* Metrics with Natural Look */
+        [data-testid="stMetricValue"] {
+            color: #2e7d32;
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        [data-testid="stMetricLabel"] {
+            color: #558b2f;
+            font-weight: 600;
+            font-size: 0.95rem;
+            font-family: 'Quicksand', sans-serif;
+        }
+        
+        [data-testid="stMetricDelta"] {
+            font-weight: 600;
+        }
+        
+        /* DataFrames */
+        .dataframe {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .dataframe thead tr th {
+            background: linear-gradient(135deg, #7cb342 0%, #9ccc65 100%);
+            color: white;
+            font-weight: 600;
+            padding: 1rem;
+            font-family: 'Quicksand', sans-serif;
+        }
+        
+        .dataframe tbody tr:nth-child(even) {
+            background-color: #f1f8e9;
+        }
+        
+        .dataframe tbody tr:hover {
+            background-color: #dcedc8;
+            transition: background-color 0.3s ease;
+        }
+        
+        /* Radio Buttons */
+        .stRadio > label {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            border: 2px solid #c5e1a5;
+            font-weight: 600;
+            color: #2e7d32;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Quicksand', sans-serif;
+        }
+        
+        .stRadio > label:hover {
+            background: linear-gradient(135deg, #c5e1a5 0%, #dcedc8 100%);
+            border-color: #7cb342;
+        }
+        
+        /* Success/Warning/Error Messages with Natural Colors */
+        .stSuccess {
+            background: linear-gradient(135deg, #c8e6c9 0%, #e8f5e9 100%);
+            border-left: 5px solid #4caf50;
+            border-radius: 8px;
+            padding: 1rem;
+            color: #1b5e20;
+        }
+        
+        .stWarning {
+            background: linear-gradient(135deg, #fff9c4 0%, #fffde7 100%);
+            border-left: 5px solid #fbc02d;
+            border-radius: 8px;
+            padding: 1rem;
+            color: #f57f17;
+        }
+        
+        .stError {
+            background: linear-gradient(135deg, #ffccbc 0%, #fbe9e7 100%);
+            border-left: 5px solid #f44336;
+            border-radius: 8px;
+            padding: 1rem;
+            color: #b71c1c;
+        }
+        
+        .stInfo {
+            background: linear-gradient(135deg, #b3e5fc 0%, #e1f5fe 100%);
+            border-left: 5px solid #03a9f4;
+            border-radius: 8px;
+            padding: 1rem;
+            color: #01579b;
+        }
+        
+        /* Divider with Natural Element */
+        hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, #7cb342 50%, transparent 100%);
+            margin: 2rem 0;
+        }
+        
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        /* Container with Nature Background */
+        .nature-container {
+            background: linear-gradient(135deg, #ffffff 0%, #f1f8e9 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1rem 0;
+            box-shadow: 0 4px 20px rgba(124, 179, 66, 0.15);
+        }
+        
+        /* Chart Containers */
+        .js-plotly-plot {
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        }
+        
+        /* Progress Indicators */
+        .stProgress > div > div > div {
+            background: linear-gradient(90deg, #7cb342 0%, #9ccc65 100%);
+        }
+        
+        /* Input Fields */
+        .stNumberInput > div > div > input,
+        .stTextInput > div > div > input {
+            border-radius: 8px;
+            border: 2px solid #c5e1a5;
+            padding: 0.5rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .stNumberInput > div > div > input:focus,
+        .stTextInput > div > div > input:focus {
+            border-color: #7cb342;
+            box-shadow: 0 0 0 2px rgba(124, 179, 66, 0.2);
+        }
+        
+        /* Slider */
+        .stSlider > div > div > div {
+            background-color: #7cb342;
+        }
+        
+        /* Download Button */
+        .stDownloadButton > button {
+            background: linear-gradient(135deg, #8bc34a 0%, #689f38 100%);
+            color: white;
+            border-radius: 25px;
+            font-weight: 600;
+            padding: 0.6rem 2rem;
+            border: none;
+            box-shadow: 0 4px 15px rgba(139, 195, 74, 0.3);
+        }
+        
+        .stDownloadButton > button:hover {
+            background: linear-gradient(135deg, #689f38 0%, #558b2f 100%);
+            box-shadow: 0 6px 20px rgba(139, 195, 74, 0.4);
+        }
+        
+        /* Custom Scroll Bar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f8e9;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #7cb342 0%, #9ccc65 100%);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #689f38 0%, #7cb342 100%);
         }
         </style>
     """, unsafe_allow_html=True)
 
-    # Header
-    st.markdown('<div class="main-header">🌾 Rice Mill Comprehensive Financial Plan</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">3 TPH Capacity — Complete Project Report</div>', unsafe_allow_html=True)
+    # Beautiful Header with Rice Theme
+    st.markdown('<div class="rice-decoration">🌾 🍚 🌾 🍚 🌾</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-header">🌾 Nature\'s Bounty Rice Mill</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">5 TPH Premium Rice Processing Plant — Complete Financial Analysis</div>', unsafe_allow_html=True)
+    st.markdown('<div class="tagline">"From Golden Fields to Your Table — Sustainable Rice Processing Excellence"</div>', unsafe_allow_html=True)
+    st.markdown('<div class="rice-decoration">🌾 🍚 🌾 🍚 🌾</div>', unsafe_allow_html=True)
 
     # Sidebar with all inputs
     with st.sidebar:
-        st.header("📊 Financial Inputs")
+        st.markdown("### 🌾 Financial Parameters")
+        st.markdown("*Customize your rice mill project details*")
+        st.markdown("---")
         
         with st.expander("💰 Capital Costs", expanded=False):
-            land_cost = st.number_input("Land Cost (₹)", value=500000.0, step=50000.0)
-            building_cost = st.number_input("Building & Civil Works (₹)", value=1500000.0, step=50000.0)
-            machinery_cost = st.number_input("Plant & Machinery (₹)", value=3000000.0, step=50000.0)
-            electrical_cost = st.number_input("Electrical Installation (₹)", value=500000.0, step=50000.0)
-            preoperative_cost = st.number_input("Pre-operative Expenses (₹)", value=300000.0, step=10000.0)
-            misc_fixed_assets = st.number_input("Miscellaneous Fixed Assets (₹)", value=200000.0, step=10000.0)
-            working_capital = st.number_input("Working Capital (₹)", value=1000000.0, step=50000.0)
+            land_cost = st.number_input("Land Cost (₹)", value=800000.0, step=50000.0)
+            building_cost = st.number_input("Building & Civil Works (₹)", value=2500000.0, step=50000.0)
+            machinery_cost = st.number_input("Plant & Machinery (₹)", value=5000000.0, step=50000.0)
+            electrical_cost = st.number_input("Electrical Installation (₹)", value=800000.0, step=50000.0)
+            preoperative_cost = st.number_input("Pre-operative Expenses (₹)", value=500000.0, step=10000.0)
+            misc_fixed_assets = st.number_input("Miscellaneous Fixed Assets (₹)", value=400000.0, step=10000.0)
+            working_capital = st.number_input("Working Capital (₹)", value=1500000.0, step=50000.0)
         
         with st.expander("🏦 Financing Details", expanded=False):
             total_proj = land_cost + building_cost + machinery_cost + electrical_cost + preoperative_cost + misc_fixed_assets + working_capital
@@ -534,18 +1691,18 @@ def main():
             broken_rice_price_per_kg = st.number_input("Broken Rice Price (₹/kg)", value=20.0, step=0.5)
         
         with st.expander("👥 Manpower Costs", expanded=False):
-            manager_salary = st.number_input("Manager Salary (₹/month)", value=30000, step=1000)
-            supervisor_salary = st.number_input("Supervisor Salary (₹/month)", value=20000, step=1000)
-            skilled_workers_salary = st.number_input("Skilled Worker Salary (₹/month)", value=15000, step=1000)
-            num_skilled_workers = st.number_input("Number of Skilled Workers", value=4, step=1)
-            unskilled_workers_salary = st.number_input("Unskilled Worker Salary (₹/month)", value=10000, step=1000)
-            num_unskilled_workers = st.number_input("Number of Unskilled Workers", value=6, step=1)
-            watchman_salary = st.number_input("Watchman Salary (₹/month)", value=8000, step=1000)
+            manager_salary = st.number_input("Manager Salary (₹/month)", value=35000, step=1000)
+            supervisor_salary = st.number_input("Supervisor Salary (₹/month)", value=25000, step=1000)
+            skilled_workers_salary = st.number_input("Skilled Worker Salary (₹/month)", value=18000, step=1000)
+            num_skilled_workers = st.number_input("Number of Skilled Workers", value=6, step=1)
+            unskilled_workers_salary = st.number_input("Unskilled Worker Salary (₹/month)", value=12000, step=1000)
+            num_unskilled_workers = st.number_input("Number of Unskilled Workers", value=8, step=1)
+            watchman_salary = st.number_input("Watchman Salary (₹/month)", value=10000, step=1000)
         
         with st.expander("⚡ Utilities & Other Costs", expanded=False):
-            power_cost_monthly = st.number_input("Power Cost (₹/month)", value=50000, step=5000)
-            water_cost_monthly = st.number_input("Water Cost (₹/month)", value=5000, step=500)
-            fuel_cost_monthly = st.number_input("Fuel Cost (₹/month)", value=10000, step=1000)
+            power_cost_monthly = st.number_input("Power Cost (₹/month)", value=80000, step=5000)
+            water_cost_monthly = st.number_input("Water Cost (₹/month)", value=8000, step=500)
+            fuel_cost_monthly = st.number_input("Fuel Cost (₹/month)", value=15000, step=1000)
             maintenance_percentage = st.number_input("Maintenance (% of Fixed Assets)", value=3.0, step=0.5)
             insurance_percentage = st.number_input("Insurance (% of Fixed Assets)", value=1.0, step=0.1)
             admin_expenses_monthly = st.number_input("Admin Expenses (₹/month)", value=15000, step=1000)
@@ -599,7 +1756,7 @@ def main():
     results = calculate_comprehensive_financials(inputs)
     
     # ===== PROJECT COST SUMMARY =====
-    st.markdown("## 💰 Project Cost Summary")
+    st.markdown('<div class="section-header">💰 Project Investment Overview</div>', unsafe_allow_html=True)
     
     col1, col2, col3, col4 = st.columns(4)
     with col1:
@@ -618,7 +1775,7 @@ def main():
             {"Component": k, "Amount (₹)": format_currency(v)} 
             for k, v in results['capital_costs'].items()
         ])
-        st.dataframe(capital_df, use_container_width=True, hide_index=True)
+        st.dataframe(capital_df, width='stretch', hide_index=True)
         
         col1, col2 = st.columns(2)
         with col1:
@@ -639,19 +1796,26 @@ def main():
     with col_center:
         view_mode = st.radio(
             "📊 Select View Mode:",
-            options=["Monthly Summary", "Annual Summary"],
+            options=["Daily Summary", "Monthly Summary", "Annual Summary"],
             horizontal=True,
-            help="Switch between monthly and annual financial views"
+            help="Switch between daily, monthly and annual financial views"
         )
     
-    is_monthly = view_mode == "Monthly Summary"
-    period_label = "Monthly" if is_monthly else "Annual"
-    period_divisor = 12 if is_monthly else 1
+    # Set period divisor based on selection
+    if view_mode == "Daily Summary":
+        period_label = "Daily"
+        period_divisor = 365  # Assuming 365 working days per year
+    elif view_mode == "Monthly Summary":
+        period_label = "Monthly"
+        period_divisor = 12
+    else:
+        period_label = "Annual"
+        period_divisor = 1
     
     st.markdown("---")
     
     # ===== PRODUCTION OVERVIEW =====
-    st.markdown(f"## 🏭 Production Overview ({period_label})")
+    st.markdown(f'<div class="section-header">🏭 Production Overview ({period_label})</div>', unsafe_allow_html=True)
     
     col1, col2, col3, col4 = st.columns(4)
     with col1:
@@ -666,12 +1830,13 @@ def main():
     st.markdown("---")
     
     # ===== REVENUE & COST ANALYSIS =====
-    st.markdown(f"## 📊 Revenue & Cost Analysis ({period_label})")
+    st.markdown(f'<div class="section-header">📊 Revenue & Cost Analysis ({period_label})</div>', unsafe_allow_html=True)
+    st.markdown("*Detailed breakdown of income streams and operational expenses*")
     
     col1, col2 = st.columns(2)
     
     with col1:
-        st.plotly_chart(create_revenue_breakdown_chart(results, period_divisor, period_label), use_container_width=True)
+        st.plotly_chart(create_revenue_breakdown_chart(results, period_divisor, period_label), width='stretch')
         
         st.markdown(f"**{period_label} Revenue Details**")
         revenue_details = pd.DataFrame([
@@ -681,10 +1846,10 @@ def main():
             {"Product": "Broken Rice", "Amount": format_currency(results['annual_revenue_broken']/period_divisor)},
             {"Product": "**Total Revenue**", "Amount": format_currency(results['total_annual_revenue']/period_divisor)},
         ])
-        st.dataframe(revenue_details, use_container_width=True, hide_index=True)
+        st.dataframe(revenue_details, width='stretch', hide_index=True)
     
     with col2:
-        st.plotly_chart(create_cost_breakdown_chart(results, period_divisor, period_label), use_container_width=True)
+        st.plotly_chart(create_cost_breakdown_chart(results, period_divisor, period_label), width='stretch')
         
         st.markdown(f"**{period_label} Cost Details**")
         cost_details = pd.DataFrame([
@@ -698,7 +1863,7 @@ def main():
             {"Component": "Admin", "Amount": format_currency(results['admin_expenses']/period_divisor)},
             {"Component": "**Total Operating Costs**", "Amount": format_currency(results['total_operating_costs']/period_divisor)},
         ])
-        st.dataframe(cost_details, use_container_width=True, hide_index=True)
+        st.dataframe(cost_details, width='stretch', hide_index=True)
     
     # Manpower breakdown
     with st.expander(f"👥 Detailed Manpower Cost Breakdown ({period_label})"):
@@ -706,12 +1871,12 @@ def main():
             {"Position": k, f"{period_label} Cost (₹)": format_currency(v/period_divisor)} 
             for k, v in results['manpower_costs'].items()
         ])
-        st.dataframe(manpower_df, use_container_width=True, hide_index=True)
+        st.dataframe(manpower_df, width='stretch', hide_index=True)
     
     st.markdown("---")
     
     # ===== PROFITABILITY ANALYSIS =====
-    st.markdown(f"## 💹 Profitability Analysis ({period_label})")
+    st.markdown(f'<div class="section-header">💹 Profitability Analysis ({period_label})</div>', unsafe_allow_html=True)
     
     col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
@@ -726,7 +1891,7 @@ def main():
         st.metric("PAT (Net Profit)", format_currency(results['pat']/period_divisor))
     
     # Profitability waterfall - now shows for both monthly and annual
-    st.plotly_chart(create_profitability_waterfall(results, period_divisor, period_label), use_container_width=True)
+    st.plotly_chart(create_profitability_waterfall(results, period_divisor, period_label), width='stretch')
     
     # Profit & Loss Statement
     with st.expander(f"📄 Detailed Profit & Loss Statement ({period_label})"):
@@ -745,12 +1910,12 @@ def main():
             {"Particulars": "Net Cash Flow", "Amount (₹)": format_currency(results['annual_cash_flow']/period_divisor)},
         ]
         pl_df = pd.DataFrame(pl_data)
-        st.dataframe(pl_df, use_container_width=True, hide_index=True)
+        st.dataframe(pl_df, width='stretch', hide_index=True)
     
     st.markdown("---")
     
     # ===== KEY RATIOS & METRICS =====
-    st.markdown("## 📈 Key Financial Ratios & Metrics")
+    st.markdown('<div class="section-header">📈 Key Financial Ratios & Performance Metrics</div>', unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns(3)
     
@@ -784,9 +1949,9 @@ def main():
     st.markdown("---")
     
     # ===== 5-YEAR PROJECTIONS =====
-    st.markdown("## 📅 5-Year Financial Projections")
+    st.markdown('<div class="section-header">📅 5-Year Financial Growth Projections</div>', unsafe_allow_html=True)
     
-    st.plotly_chart(create_projection_chart(results['yearly_data']), use_container_width=True)
+    st.plotly_chart(create_projection_chart(results['yearly_data']), width='stretch')
     
     # Detailed projection table
     with st.expander("📋 Detailed 5-Year Projection Table", expanded=True):
@@ -797,7 +1962,7 @@ def main():
                     "Interest", "PBT", "Tax", "PAT", "Cash Flow", "Cumulative Cash", "Loan Balance"]:
             df_display[col] = df_display[col].apply(lambda x: format_currency(x))
         
-        st.dataframe(df_display, use_container_width=True, hide_index=True)
+        st.dataframe(df_display, width='stretch', hide_index=True)
         
         # Download button
         csv = df_proj.to_csv(index=False)
@@ -810,56 +1975,186 @@ def main():
     
     st.markdown("---")
     
+    # ===== AI-POWERED INSIGHTS & RECOMMENDATIONS =====
+    st.markdown('<div class="section-header">🤖 AI-Powered Financial Intelligence & Strategic Recommendations</div>', unsafe_allow_html=True)
+    st.markdown("*Advanced insights generated by analyzing 15+ financial parameters to guide your decision-making*")
+    
+    # Generate AI insights
+    ai_insights = generate_ai_insights(results, inputs)
+    
+    # Display insights in organized tabs
+    insight_tabs = st.tabs(["🔴 Critical Issues", "⚠️ Warnings", "💡 Recommendations", "✅ Positive Indicators"])
+    
+    with insight_tabs[0]:  # Critical Issues
+        if ai_insights['critical']:
+            st.markdown("### Critical Issues Requiring Immediate Attention")
+            for idx, insight in enumerate(ai_insights['critical'], 1):
+                with st.container():
+                    st.markdown(f"#### {idx}. {insight['title']}")
+                    st.error(f"**Quick Summary:** {insight['message']}")
+                    
+                    # Show detailed explanation in expander
+                    if 'detail' in insight:
+                        with st.expander("📊 View Detailed Analysis & Financial Breakdown"):
+                            st.markdown(insight['detail'])
+                    
+                    st.markdown(f"**💡 Recommended Action Plan:**")
+                    st.markdown(insight['action'])
+                    st.markdown("---")
+        else:
+            st.success("✅ No critical issues detected! Your project parameters look solid.")
+    
+    with insight_tabs[1]:  # Warnings
+        if ai_insights['warnings']:
+            st.markdown("### Areas of Concern - Consider These Carefully")
+            for idx, insight in enumerate(ai_insights['warnings'], 1):
+                with st.container():
+                    st.markdown(f"#### {idx}. {insight['title']}")
+                    st.warning(f"**Quick Summary:** {insight['message']}")
+                    
+                    # Show detailed explanation in expander
+                    if 'detail' in insight:
+                        with st.expander("📊 View Detailed Analysis & Financial Breakdown"):
+                            st.markdown(insight['detail'])
+                    
+                    st.markdown(f"**💡 Suggested Action Plan:**")
+                    st.markdown(insight['action'])
+                    st.markdown("---")
+        else:
+            st.success("✅ No significant warnings! Your financial structure appears balanced.")
+    
+    with insight_tabs[2]:  # Recommendations
+        if ai_insights['recommendations']:
+            st.markdown("### Optimization Opportunities")
+            for idx, insight in enumerate(ai_insights['recommendations'], 1):
+                with st.container():
+                    st.markdown(f"#### {idx}. {insight['title']}")
+                    st.info(f"**Quick Summary:** {insight['message']}")
+                    
+                    # Show detailed explanation in expander
+                    if 'detail' in insight:
+                        with st.expander("📊 View Detailed Analysis & Financial Breakdown"):
+                            st.markdown(insight['detail'])
+                    
+                    st.markdown(f"**💡 Consider These Actions:**")
+                    st.markdown(insight['action'])
+                    st.markdown("---")
+        else:
+            st.info("Your current setup is well-optimized. Monitor performance regularly.")
+    
+    with insight_tabs[3]:  # Positive Indicators
+        if ai_insights['positive']:
+            st.markdown("### Strong Points - Your Competitive Advantages")
+            for idx, insight in enumerate(ai_insights['positive'], 1):
+                with st.container():
+                    st.markdown(f"#### {idx}. {insight['title']}")
+                    st.success(f"**Quick Summary:** {insight['message']}")
+                    
+                    # Show detailed explanation in expander
+                    if 'detail' in insight:
+                        with st.expander("📊 View Detailed Analysis & Financial Breakdown"):
+                            st.markdown(insight['detail'])
+                    
+                    st.markdown(f"**💡 How to Leverage This Strength:**")
+                    st.markdown(insight['action'])
+                    st.markdown("---")
+        else:
+            st.info("Focus on addressing the concerns above to improve project viability.")
+    
+    # Overall AI Assessment
     st.markdown("---")
+    st.markdown("### 🎯 Overall AI Assessment")
     
-    # ===== INSIGHTS & RECOMMENDATIONS =====
-    st.markdown("## 💡 Financial Insights & Recommendations")
-    
-    col1, col2 = st.columns(2)
+    col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.markdown("**Project Viability**")
-        if results['pat'] > 0:
-            st.success(f"✅ **Profitable Project**: Annual PAT of {format_currency(results['pat'])}")
+        critical_count = len(ai_insights['critical'])
+        if critical_count == 0:
+            st.metric("Critical Issues", "0", delta="Excellent", delta_color="normal")
         else:
-            st.error(f"❌ **Loss Making**: Annual loss of {format_currency(abs(results['pat']))}")
-        
-        if results['payback_years'] and results['payback_years'] <= 5:
-            st.success(f"✅ **Quick Payback**: {results['payback_years']:.1f} years")
-        elif results['payback_years']:
-            st.warning(f"⚠️ **Long Payback**: {results['payback_years']:.1f} years")
-        
-        if results['roi_percent'] > 20:
-            st.success(f"✅ **Excellent ROI**: {format_percentage(results['roi_percent'])} per annum")
-        elif results['roi_percent'] > 15:
-            st.info(f"ℹ️ **Good ROI**: {format_percentage(results['roi_percent'])} per annum")
-        elif results['roi_percent'] > 0:
-            st.warning(f"⚠️ **Low ROI**: {format_percentage(results['roi_percent'])} per annum")
+            st.metric("Critical Issues", str(critical_count), delta="Needs Attention", delta_color="inverse")
     
     with col2:
-        st.markdown("**Operational Efficiency**")
-        if results['net_margin'] > 15:
-            st.success(f"✅ **Healthy Profit Margin**: {format_percentage(results['net_margin'])}")
-        elif results['net_margin'] > 10:
-            st.info(f"ℹ️ **Moderate Margin**: {format_percentage(results['net_margin'])}")
-        elif results['net_margin'] > 0:
-            st.warning(f"⚠️ **Thin Margin**: {format_percentage(results['net_margin'])}")
-        
-        capacity_at_breakeven = (results['breakeven_kg'] / results['rice_kg_year'] * 100) if results['rice_kg_year'] > 0 else 0
-        if capacity_at_breakeven < 60:
-            st.success(f"✅ **Low Break-even Point**: {capacity_at_breakeven:.1f}% capacity")
-        elif capacity_at_breakeven < 80:
-            st.info(f"ℹ️ **Moderate Break-even**: {capacity_at_breakeven:.1f}% capacity")
+        warning_count = len(ai_insights['warnings'])
+        if warning_count <= 2:
+            st.metric("Warnings", str(warning_count), delta="Manageable", delta_color="normal")
         else:
-            st.warning(f"⚠️ **High Break-even**: {capacity_at_breakeven:.1f}% capacity")
-        
-        final_cumulative = results['yearly_data'][-1]['Cumulative Cash']
-        if final_cumulative > results['total_project_cost']:
-            st.success(f"✅ **Strong Cash Generation**: 5-year cumulative of {format_currency(final_cumulative)}")
-        elif final_cumulative > 0:
-            st.info(f"ℹ️ **Positive Cash Flow**: 5-year cumulative of {format_currency(final_cumulative)}")
+            st.metric("Warnings", str(warning_count), delta="Review Required", delta_color="inverse")
+    
+    with col3:
+        rec_count = len(ai_insights['recommendations'])
+        st.metric("Opportunities", str(rec_count), delta=f"{rec_count} found", delta_color="off")
+    
+    with col4:
+        positive_count = len(ai_insights['positive'])
+        if positive_count >= 3:
+            st.metric("Strengths", str(positive_count), delta="Strong", delta_color="normal")
         else:
-            st.error(f"❌ **Negative Cash Flow**: 5-year cumulative of {format_currency(final_cumulative)}")
+            st.metric("Strengths", str(positive_count), delta="Build More", delta_color="off")
+    
+    # Final AI Recommendation
+    st.markdown("---")
+    total_critical_warnings = len(ai_insights['critical']) + len(ai_insights['warnings'])
+    total_positive = len(ai_insights['positive'])
+    
+    if len(ai_insights['critical']) > 0:
+        st.error("� **AI Recommendation:** Critical issues detected. Address these before proceeding with the project. Consider revising your financial plan.")
+    elif len(ai_insights['warnings']) > 3:
+        st.warning("⚠️ **AI Recommendation:** Multiple areas of concern identified. Review and optimize your plan before implementation.")
+    elif total_positive > total_critical_warnings:
+        st.success("✅ **AI Recommendation:** Project shows strong fundamentals! Proceed with confidence while monitoring the suggested improvements.")
+    else:
+        st.info("ℹ️ **AI Recommendation:** Project is viable but has room for optimization. Address the recommendations to strengthen your position.")
+    
+    st.markdown("---")
+    
+    # Traditional Insights (kept for compatibility)
+    with st.expander("📊 Detailed Viability Metrics", expanded=False):
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("**Project Viability**")
+            if results['pat'] > 0:
+                st.success(f"✅ **Profitable Project**: Annual PAT of {format_currency(results['pat'])}")
+            else:
+                st.error(f"❌ **Loss Making**: Annual loss of {format_currency(abs(results['pat']))}")
+            
+            if results['payback_years'] and results['payback_years'] <= 5:
+                st.success(f"✅ **Quick Payback**: {results['payback_years']:.1f} years")
+            elif results['payback_years']:
+                st.warning(f"⚠️ **Long Payback**: {results['payback_years']:.1f} years")
+            
+            if results['roi_percent'] > 20:
+                st.success(f"✅ **Excellent ROI**: {format_percentage(results['roi_percent'])} per annum")
+            elif results['roi_percent'] > 15:
+                st.info(f"ℹ️ **Good ROI**: {format_percentage(results['roi_percent'])} per annum")
+            elif results['roi_percent'] > 0:
+                st.warning(f"⚠️ **Low ROI**: {format_percentage(results['roi_percent'])} per annum")
+        
+        with col2:
+            st.markdown("**Operational Efficiency**")
+            if results['net_margin'] > 15:
+                st.success(f"✅ **Healthy Profit Margin**: {format_percentage(results['net_margin'])}")
+            elif results['net_margin'] > 10:
+                st.info(f"ℹ️ **Moderate Margin**: {format_percentage(results['net_margin'])}")
+            elif results['net_margin'] > 0:
+                st.warning(f"⚠️ **Thin Margin**: {format_percentage(results['net_margin'])}")
+            
+            capacity_at_breakeven = (results['breakeven_kg'] / results['rice_kg_year'] * 100) if results['rice_kg_year'] > 0 else 0
+            if capacity_at_breakeven < 60:
+                st.success(f"✅ **Low Break-even Point**: {capacity_at_breakeven:.1f}% capacity")
+            elif capacity_at_breakeven < 80:
+                st.info(f"ℹ️ **Moderate Break-even**: {capacity_at_breakeven:.1f}% capacity")
+            else:
+                st.warning(f"⚠️ **High Break-even**: {capacity_at_breakeven:.1f}% capacity")
+            
+            final_cumulative = results['yearly_data'][-1]['Cumulative Cash']
+            if final_cumulative > results['total_project_cost']:
+                st.success(f"✅ **Strong Cash Generation**: 5-year cumulative of {format_currency(final_cumulative)}")
+            elif final_cumulative > 0:
+                st.info(f"ℹ️ **Positive Cash Flow**: 5-year cumulative of {format_currency(final_cumulative)}")
+            else:
+                st.error(f"❌ **Negative Cash Flow**: 5-year cumulative of {format_currency(final_cumulative)}")
 
 
 if __name__ == "__main__":
