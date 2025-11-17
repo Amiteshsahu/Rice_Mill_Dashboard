@@ -6,13 +6,98 @@ from plotly.subplots import make_subplots
 
 
 def format_currency(x):
-    """Format number as Indian currency"""
-    return f"₹ {x:,.0f}"
+    """Format number as Indian currency with lakhs and crores"""
+    if x < 0:
+        return f"-{format_currency(abs(x))}"
+    
+    x = round(x)
+    
+    if x >= 10000000:  # 1 crore or more
+        crores = x / 10000000
+        return f"₹ {crores:.2f} Cr"
+    elif x >= 100000:  # 1 lakh or more
+        lakhs = x / 100000
+        return f"₹ {lakhs:.2f} L"
+    elif x >= 1000:  # Use thousands with Indian comma system
+        s = str(x)
+        if len(s) <= 3:
+            return f"₹ {s}"
+        result = s[-3:]
+        s = s[:-3]
+        while s:
+            if len(s) <= 2:
+                result = s + "," + result
+                break
+            else:
+                result = s[-2:] + "," + result
+                s = s[:-2]
+        return f"₹ {result}"
+    else:
+        return f"₹ {x:,.0f}"
+
+
+def format_currency_full(x):
+    """Format number as Indian currency with full digits and Indian comma system"""
+    if x < 0:
+        sign = "-"
+        x = abs(x)
+    else:
+        sign = ""
+    
+    x = round(x)
+    s = str(x)
+    
+    if len(s) <= 3:
+        return f"{sign}₹ {s}"
+    
+    result = s[-3:]
+    s = s[:-3]
+    while s:
+        if len(s) <= 2:
+            result = s + "," + result
+            break
+        else:
+            result = s[-2:] + "," + result
+            s = s[:-2]
+    
+    return f"{sign}₹ {result}"
 
 
 def format_percentage(x):
     """Format number as percentage"""
     return f"{x:.1f}%"
+
+
+def format_indian_number(x, decimals=0):
+    """Format number with Indian comma system (no currency symbol)"""
+    if x < 0:
+        return f"-{format_indian_number(abs(x), decimals)}"
+    
+    if decimals > 0:
+        x_formatted = f"{x:.{decimals}f}"
+        int_part, dec_part = x_formatted.split('.')
+    else:
+        int_part = str(int(round(x)))
+        dec_part = None
+    
+    if len(int_part) <= 3:
+        result = int_part
+    else:
+        s = int_part
+        result = s[-3:]
+        s = s[:-3]
+        while s:
+            if len(s) <= 2:
+                result = s + "," + result
+                break
+            else:
+                result = s[-2:] + "," + result
+                s = s[:-2]
+    
+    if dec_part:
+        result = result + "." + dec_part
+    
+    return result
 
 
 def generate_ai_insights(results, inputs):
@@ -145,8 +230,8 @@ def generate_ai_insights(results, inputs):
             'detail': f"**Break-Even Analysis - Critical Situation:**\n\n"
                      f"📊 **Break-Even Metrics:**\n"
                      f"- Break-even capacity: {breakeven_capacity:.1f}%\n"
-                     f"- Break-even production: {results['breakeven_kg']:,.0f} kg/year\n"
-                     f"- Your planned production: {results['rice_kg_year']:,.0f} kg/year\n"
+                     f"- Break-even production: {format_indian_number(results['breakeven_kg'])} kg/year\n"
+                     f"- Your planned production: {format_indian_number(results['rice_kg_year'])} kg/year\n"
                      f"- Safety margin: Only {100 - breakeven_capacity:.1f}%\n\n"
                      f"⚠️ **Understanding Break-Even:**\n"
                      f"Break-even point is where Total Revenue = Total Costs (you make ₹0 profit). Operating at {breakeven_capacity:.1f}% capacity means:\n"
@@ -191,9 +276,9 @@ def generate_ai_insights(results, inputs):
             'detail': f"**Break-Even Analysis - Caution Advised:**\n\n"
                      f"📊 **Current Break-Even Position:**\n"
                      f"- Break-even capacity: {breakeven_capacity:.1f}%\n"
-                     f"- Break-even volume: {results['breakeven_kg']:,.0f} kg/year\n"
+                     f"- Break-even volume: {format_indian_number(results['breakeven_kg'])} kg/year\n"
                      f"- Safety margin: {100 - breakeven_capacity:.1f}%\n"
-                     f"- Monthly break-even: {results['breakeven_kg'] / 12:,.0f} kg\n\n"
+                     f"- Monthly break-even: {format_indian_number(results['breakeven_kg'] / 12)} kg\n\n"
                      f"📈 **Cost Structure:**\n"
                      f"- Fixed costs/year: {format_currency(results['total_operating_costs'] * 0.4)}\n"
                      f"- Variable costs/year: {format_currency(results['total_operating_costs'] * 0.6)}\n"
@@ -245,7 +330,7 @@ def generate_ai_insights(results, inputs):
                      f"🌟 **Your Strong Position:**\n"
                      f"- Break-even capacity: {breakeven_capacity:.1f}%\n"
                      f"- Safety margin: {100 - breakeven_capacity:.1f}%\n"
-                     f"- Break-even volume: {results['breakeven_kg']:,.0f} kg/year\n"
+                     f"- Break-even volume: {format_indian_number(results['breakeven_kg'])} kg/year\n"
                      f"- Profit zone begins at: {breakeven_capacity:.0f}% capacity\n\n"
                      f"📊 **Financial Strength:**\n"
                      f"Your low break-even means:\n"
@@ -1128,9 +1213,15 @@ def create_revenue_breakdown_chart(results, period_divisor=1, period_label="Annu
         results['annual_revenue_broken'] / period_divisor
     ]
     
+    # Create custom text with Indian formatting
+    text_labels = [format_currency(v) for v in values]
+    
     fig = go.Figure(data=[go.Pie(
         labels=labels,
         values=values,
+        text=text_labels,
+        textinfo='label+percent',
+        hovertemplate='<b>%{label}</b><br>Amount: %{text}<br>Share: %{percent}<extra></extra>',
         hole=.4,
         marker_colors=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']
     )])
@@ -1166,9 +1257,15 @@ def create_cost_breakdown_chart(results, period_divisor=1, period_label="Annual"
         results['admin_expenses'] / period_divisor
     ]
     
+    # Create custom text with Indian formatting
+    text_labels = [format_currency(v) for v in values]
+    
     fig = go.Figure(data=[go.Pie(
         labels=labels,
         values=values,
+        text=text_labels,
+        textinfo='label+percent',
+        hovertemplate='<b>%{label}</b><br>Amount: %{text}<br>Share: %{percent}<extra></extra>',
         hole=.3
     )])
     
@@ -1182,18 +1279,25 @@ def create_cost_breakdown_chart(results, period_divisor=1, period_label="Annual"
 
 def create_profitability_waterfall(results, period_divisor=1, period_label="Annual"):
     """Create waterfall chart showing profit calculation"""
+    values = [
+        results['total_annual_revenue'] / period_divisor,
+        -results['total_operating_costs'] / period_divisor,
+        -results['annual_depreciation'] / period_divisor,
+        -results['annual_interest'] / period_divisor,
+        -results['tax_amount'] / period_divisor,
+        results['pat'] / period_divisor
+    ]
+    
+    # Create custom text with Indian formatting
+    text_labels = [format_currency(abs(v)) for v in values]
+    
     fig = go.Figure(go.Waterfall(
         orientation="v",
         measure=["relative", "relative", "relative", "relative", "relative", "total"],
         x=["Revenue", "Operating Costs", "Depreciation", "Interest", "Tax", "Net Profit (PAT)"],
-        y=[
-            results['total_annual_revenue'] / period_divisor,
-            -results['total_operating_costs'] / period_divisor,
-            -results['annual_depreciation'] / period_divisor,
-            -results['annual_interest'] / period_divisor,
-            -results['tax_amount'] / period_divisor,
-            results['pat'] / period_divisor
-        ],
+        y=values,
+        text=text_labels,
+        textposition="outside",
         connector={"line": {"color": "rgb(63, 63, 63)"}},
     ))
     
@@ -1819,13 +1923,13 @@ def main():
     
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric(f"{period_label} Paddy Processed", f"{results['paddy_tonnes_year']/period_divisor:,.1f} tonnes")
+        st.metric(f"{period_label} Paddy Processed", f"{format_indian_number(results['paddy_tonnes_year']/period_divisor, 1)} tonnes")
     with col2:
-        st.metric(f"{period_label} Rice Produced", f"{results['rice_tonnes_year']/period_divisor:,.1f} tonnes")
+        st.metric(f"{period_label} Rice Produced", f"{format_indian_number(results['rice_tonnes_year']/period_divisor, 1)} tonnes")
     with col3:
-        st.metric(f"{period_label} Bran", f"{results['bran_tonnes_year']/period_divisor:,.1f} tonnes")
+        st.metric(f"{period_label} Bran", f"{format_indian_number(results['bran_tonnes_year']/period_divisor, 1)} tonnes")
     with col4:
-        st.metric(f"{period_label} Husk", f"{results['husk_tonnes_year']/period_divisor:,.1f} tonnes")
+        st.metric(f"{period_label} Husk", f"{format_indian_number(results['husk_tonnes_year']/period_divisor, 1)} tonnes")
     
     st.markdown("---")
     
@@ -1935,7 +2039,7 @@ def main():
     
     with col3:
         st.markdown("**Break-even Analysis**")
-        st.metric("Break-even Volume", f"{results['breakeven_kg']:,.0f} kg rice")
+        st.metric("Break-even Volume", f"{format_indian_number(results['breakeven_kg'])} kg rice")
         st.metric("Break-even Revenue", format_currency(results['breakeven_revenue']))
         capacity_utilization = (results['breakeven_kg'] / results['rice_kg_year'] * 100) if results['rice_kg_year'] > 0 else 0
         st.metric("Break-even Capacity %", f"{capacity_utilization:.1f}%")
