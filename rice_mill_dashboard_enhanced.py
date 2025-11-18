@@ -68,6 +68,109 @@ def format_percentage(x):
     return f"{x:.1f}%"
 
 
+def get_financial_glossary():
+    """Return dictionary of financial terms and their definitions"""
+    return {
+        "Gross Profit": {
+            "short": "Revenue - Operating Costs",
+            "definition": "The profit a company makes after deducting the costs associated with making and selling its products or services. It represents the efficiency of production and pricing.",
+            "formula": "Gross Profit = Total Revenue - Total Operating Costs",
+            "example": "If revenue is ₹10 Cr and operating costs are ₹8 Cr, Gross Profit = ₹2 Cr"
+        },
+        "EBITDA": {
+            "short": "Earnings Before Interest, Tax, Depreciation & Amortization",
+            "definition": "A measure of a company's operating performance. It shows how much profit the business generates from its core operations before accounting for capital structure (interest), taxes, and non-cash expenses (depreciation).",
+            "formula": "EBITDA = Total Revenue - Operating Costs",
+            "example": "EBITDA is used to compare profitability between companies and industries, as it eliminates the effects of financing and accounting decisions.",
+            "why_important": "Shows the true operational profitability without considering how the business is financed or taxed."
+        },
+        "EBIT": {
+            "short": "Earnings Before Interest & Tax",
+            "definition": "The operating profit after accounting for depreciation. It shows how much profit the business makes from operations before paying interest on loans and taxes.",
+            "formula": "EBIT = EBITDA - Depreciation",
+            "example": "If EBITDA is ₹1.5 Cr and depreciation is ₹30 L, then EBIT = ₹1.2 Cr",
+            "why_important": "Indicates the profitability of core business operations before considering debt servicing and tax obligations."
+        },
+        "PBT": {
+            "short": "Profit Before Tax",
+            "definition": "The profit earned by the company after paying all expenses including interest on loans, but before paying income tax to the government.",
+            "formula": "PBT = EBIT - Interest on Loans",
+            "example": "If EBIT is ₹1.2 Cr and annual interest is ₹20 L, then PBT = ₹1 Cr",
+            "why_important": "Shows profitability after all operating and financing costs, before tax obligations."
+        },
+        "PAT": {
+            "short": "Profit After Tax (Net Profit)",
+            "definition": "The final profit that belongs to the business owners after paying all expenses, interest, and taxes. This is the 'bottom line' - the actual money the business gets to keep.",
+            "formula": "PAT = PBT - Income Tax",
+            "example": "If PBT is ₹1 Cr and tax is ₹25 L, then PAT = ₹75 L (this is your actual profit)",
+            "why_important": "This is the real profit available for distribution to owners, reinvestment, or debt repayment."
+        },
+        "Depreciation": {
+            "short": "Reduction in asset value over time",
+            "definition": "The decrease in value of machinery, equipment, and buildings over time due to wear and tear. It's a non-cash expense that reduces profit on paper but doesn't involve actual cash outflow.",
+            "formula": "Annual Depreciation = Asset Cost ÷ Useful Life",
+            "example": "If machinery costs ₹50 L with 10-year life, annual depreciation = ₹5 L",
+            "why_important": "Reduces taxable income (saving tax) and helps plan for equipment replacement."
+        },
+        "ROI": {
+            "short": "Return on Investment",
+            "definition": "A percentage that shows how much profit you earn compared to the total money invested in the project. Higher ROI means better returns.",
+            "formula": "ROI = (Annual PAT ÷ Total Project Cost) × 100",
+            "example": "If PAT is ₹75 L and project cost is ₹5 Cr, ROI = 15%",
+            "why_important": "Helps compare different investment opportunities and decide if the project is worthwhile."
+        },
+        "Break-even Point": {
+            "short": "Zero profit, zero loss point",
+            "definition": "The level of sales or production at which total revenue equals total costs. Below this point, you make losses; above it, you make profits.",
+            "formula": "Break-even Volume = Fixed Costs ÷ (Sale Price per unit - Variable Cost per unit)",
+            "example": "If you need to produce 3,45,000 kg to cover all costs, that's your break-even point",
+            "why_important": "Critical for planning - tells you the minimum sales needed to avoid losses."
+        },
+        "Debt-Equity Ratio": {
+            "short": "Loan amount compared to own investment",
+            "definition": "A ratio that compares how much you borrowed (debt) versus how much you invested from your own pocket (equity). Shows the financial risk level.",
+            "formula": "Debt-Equity Ratio = Total Loan ÷ Own Investment",
+            "example": "If loan is ₹4 Cr and equity is ₹1 Cr, ratio = 4:1 (higher risk)",
+            "why_important": "Banks prefer lower ratios (2:1 or 3:1) as it shows you have skin in the game."
+        },
+        "Working Capital": {
+            "short": "Money needed for daily operations",
+            "definition": "The funds required to manage day-to-day operations like buying raw materials, paying salaries, utilities, etc. It's the cushion to keep business running smoothly.",
+            "formula": "Working Capital = 2-3 months of Operating Expenses",
+            "example": "If monthly expenses are ₹30 L, working capital needed = ₹60-90 L",
+            "why_important": "Without adequate working capital, business can face cash flow problems even if profitable."
+        },
+        "EMI": {
+            "short": "Equated Monthly Installment",
+            "definition": "The fixed amount you pay to the bank every month to repay your loan. It includes both principal repayment and interest charges.",
+            "formula": "EMI = [P × R × (1+R)^N] ÷ [(1+R)^N - 1]",
+            "example": "For ₹40 L loan at 12% for 10 years, EMI ≈ ₹57,350/month",
+            "why_important": "Must ensure business generates enough cash flow to comfortably pay EMI every month."
+        },
+        "Cash Flow": {
+            "short": "Actual cash available after all payments",
+            "definition": "The net amount of cash moving in and out of business. Positive cash flow means more cash coming in than going out.",
+            "formula": "Cash Flow = PAT + Depreciation - Loan Principal Repayment",
+            "example": "If PAT is ₹75 L, depreciation ₹35 L, principal payment ₹30 L, Cash Flow = ₹80 L",
+            "why_important": "More important than profit for survival - you can be profitable but run out of cash!"
+        },
+        "Margin": {
+            "short": "Profit as a percentage of revenue",
+            "definition": "Shows what percentage of revenue becomes profit. Higher margins mean better profitability and pricing power.",
+            "formula": "Net Margin = (PAT ÷ Revenue) × 100",
+            "example": "If PAT is ₹75 L and revenue is ₹9.75 Cr, margin = 7.7%",
+            "why_important": "Industry comparison tool - helps understand if you're priced competitively and operating efficiently."
+        },
+        "Capacity Utilization": {
+            "short": "Percentage of maximum production used",
+            "definition": "How much of your mill's maximum production capacity you're actually using. 100% means running at full capacity.",
+            "formula": "Capacity Utilization = (Actual Production ÷ Maximum Capacity) × 100",
+            "example": "If you produce 4,500 tonnes but can produce 5,000 tonnes, utilization = 90%",
+            "why_important": "Higher utilization means better efficiency and lower per-unit costs (spreading fixed costs)."
+        }
+    }
+
+
 def format_indian_number(x, decimals=0):
     """Format number with Indian comma system (no currency symbol)"""
     if x < 0:
@@ -1760,6 +1863,63 @@ def main():
     st.markdown('<div class="sub-header">5 TPH Premium Rice Processing Plant — Complete Financial Analysis</div>', unsafe_allow_html=True)
     st.markdown('<div class="tagline">"From Golden Fields to Your Table — Sustainable Rice Processing Excellence"</div>', unsafe_allow_html=True)
     st.markdown('<div class="rice-decoration">🌾 🍚 🌾 🍚 🌾</div>', unsafe_allow_html=True)
+    
+    # Add helpful introduction
+    with st.expander("ℹ️ How to Use This Dashboard & Understanding Financial Terms", expanded=False):
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("""
+            ### 📊 Dashboard Purpose
+            This comprehensive financial planning tool helps you:
+            - **Plan** your rice mill investment with realistic projections
+            - **Analyze** profitability, break-even, and returns
+            - **Understand** financial viability before investing
+            - **Present** to banks, investors, or partners
+            
+            ### 🎯 Quick Start Guide
+            1. **Adjust Inputs** in the left sidebar (capital costs, loan details, operations)
+            2. **Review Outputs** in the main dashboard (all calculations are automatic)
+            3. **Check AI Insights** for personalized recommendations
+            4. **Download** projections as CSV for your records
+            
+            ### 💡 Key Metrics to Watch
+            - **PAT (Net Profit)** - Your actual earnings after all expenses
+            - **ROI** - Return on investment (target: 15%+)
+            - **Break-even** - Minimum production to avoid losses
+            - **Cash Flow** - Actual money available each month
+            """)
+        
+        with col2:
+            st.markdown("""
+            ### 📚 Common Financial Terms (Simple Explanation)
+            
+            **EBITDA** = Earnings Before Interest, Tax, Depreciation, Amortization
+            - *In simple words:* Operating profit before accounting stuff
+            - *Why care:* Shows if your rice mill operations are profitable
+            
+            **PAT** = Profit After Tax (also called Net Profit)
+            - *In simple words:* The actual money you take home
+            - *Why care:* This is YOUR profit - what's left after everything
+            
+            **ROI** = Return on Investment
+            - *In simple words:* How much profit per ₹100 invested
+            - *Why care:* Tells if this project is worth your money
+            
+            **Break-even** = Zero profit, zero loss point
+            - *In simple words:* Minimum sales needed to survive
+            - *Why care:* Below this = losses, above this = profits
+            
+            **Depreciation** = Asset value reduction over time
+            - *In simple words:* Machinery loses value as it ages
+            - *Why care:* Reduces tax bill (non-cash expense)
+            
+            **EMI** = Equated Monthly Installment
+            - *In simple words:* Monthly loan payment to bank
+            - *Why care:* Must ensure cash flow can cover this
+            
+            *📖 Click "Financial Terms Glossary" in the Profitability section for detailed definitions with examples!*
+            """)
 
     # Sidebar with all inputs
     with st.sidebar:
@@ -1864,14 +2024,18 @@ def main():
     
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("Total Fixed Capital", format_currency(results['total_fixed_capital']))
+        st.metric("Total Fixed Capital", format_currency(results['total_fixed_capital']),
+                 help="Total investment in land, building, machinery, and equipment. These are long-term assets.")
     with col2:
-        st.metric("Working Capital", format_currency(results['working_capital']))
+        st.metric("Working Capital", format_currency(results['working_capital']),
+                 help="Money needed for day-to-day operations like buying paddy, paying salaries, utilities etc. (2-3 months operating expenses)")
     with col3:
-        st.metric("Total Project Cost", format_currency(results['total_project_cost']))
+        st.metric("Total Project Cost", format_currency(results['total_project_cost']),
+                 help="Total investment needed = Fixed Capital + Working Capital. This is what you need to start the business.")
     with col4:
         debt_equity_ratio = results['loan_amount'] / results['equity_amount'] if results['equity_amount'] > 0 else 0
-        st.metric("Debt-Equity Ratio", f"{debt_equity_ratio:.2f}:1")
+        st.metric("Debt-Equity Ratio", f"{debt_equity_ratio:.2f}:1",
+                 help="Loan amount compared to your own investment. Lower ratio means less risk. Banks prefer 2:1 or 3:1.")
     
     # Capital cost breakdown table
     with st.expander("📋 Detailed Capital Cost Breakdown", expanded=False):
@@ -1892,6 +2056,98 @@ def main():
             st.markdown("**Loan Repayment**")
             st.write(f"- Monthly EMI: {format_currency(results['emi'])}")
             st.write(f"- Annual Payment: {format_currency(results['annual_loan_payment'])}")
+            
+            # EMI breakdown
+            st.markdown("**EMI Breakdown (Annual)**")
+            st.write(f"- Interest Portion: {format_currency(results['annual_interest'])}")
+            st.write(f"- Principal Portion: {format_currency(results['annual_loan_payment'] - results['annual_interest'])}")
+            st.info(f"💡 **Note:** Interest is tax-deductible (reduces taxable income), but principal repayment comes from profit after tax.")
+    
+    st.markdown("---")
+    
+    # ===== EMI & CASH FLOW SUMMARY =====
+    st.markdown('<div class="section-header">💰 EMI Impact & Cash Flow Analysis</div>', unsafe_allow_html=True)
+    
+    # Check if there's any loan
+    if results['loan_amount'] <= 0 or results['emi'] <= 0:
+        st.info("ℹ️ **No Loan Taken:** This project is fully funded by equity (own funds). No EMI payments required. All PAT is available for business use!")
+        st.markdown("---")
+    else:
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Monthly EMI", format_currency(results['emi']),
+                     help="Fixed monthly payment to bank. Includes both interest and principal repayment.")
+        with col2:
+            monthly_pat = results['pat'] / 12
+            st.metric("Monthly Profit (PAT)", format_currency(monthly_pat),
+                     help="Average monthly profit after all expenses and taxes.")
+        with col3:
+            monthly_principal = (results['annual_loan_payment'] - results['annual_interest']) / 12
+            net_cash_monthly = monthly_pat - monthly_principal
+            st.metric("Net Cash After EMI", format_currency(net_cash_monthly),
+                     help="Actual cash available each month after paying EMI principal. This is money you can use for business or personal needs.",
+                     delta=f"{(net_cash_monthly/results['emi']*100):.1f}% of EMI" if results['emi'] > 0 else None)
+        with col4:
+            dscr = (monthly_pat + results['annual_depreciation']/12) / results['emi'] if results['emi'] > 0 else 0
+            st.metric("DSCR (Debt Coverage)", f"{dscr:.2f}x",
+                     help="Debt Service Coverage Ratio. Shows ability to pay EMI. Ideal: >1.5x, Minimum: 1.25x, Below 1.0x: Cannot service debt!")
+        
+        # Visual cash flow representation
+        with st.expander("📊 Detailed EMI & Cash Flow Breakdown", expanded=False):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.markdown("### 💳 Annual EMI Breakdown")
+                
+                # Calculate percentages safely (handle division by zero)
+                if results['annual_loan_payment'] > 0:
+                    interest_pct = (results['annual_interest']/results['annual_loan_payment']*100)
+                    principal_pct = ((results['annual_loan_payment'] - results['annual_interest'])/results['annual_loan_payment']*100)
+                else:
+                    interest_pct = 0
+                    principal_pct = 0
+                
+                emi_breakdown = pd.DataFrame([
+                    {"Component": "Total EMI Payment", "Amount": format_currency(results['annual_loan_payment'])},
+                    {"Component": "  ├─ Interest Portion", "Amount": format_currency(results['annual_interest'])},
+                    {"Component": "  └─ Principal Portion", "Amount": format_currency(results['annual_loan_payment'] - results['annual_interest'])},
+                    {"Component": "", "Amount": ""},
+                    {"Component": "Interest as % of EMI", "Amount": f"{interest_pct:.1f}%"},
+                    {"Component": "Principal as % of EMI", "Amount": f"{principal_pct:.1f}%"},
+                ])
+                st.dataframe(emi_breakdown, width='stretch', hide_index=True)
+                
+                st.info("""
+                **💡 Understanding EMI:**
+                - **Interest** reduces your PBT (tax-deductible)
+                - **Principal** is paid from PAT (after-tax profit)
+                - Early years: High interest, Low principal
+                - Later years: Low interest, High principal
+                """)
+            
+            with col2:
+                st.markdown("### 💵 Cash Flow After EMI")
+                cash_flow_detail = pd.DataFrame([
+                    {"Particulars": "Revenue", "Annual": format_currency(results['total_annual_revenue']), "Monthly": format_currency(results['total_annual_revenue']/12)},
+                    {"Particulars": "Less: Operating Costs", "Annual": format_currency(results['total_operating_costs']), "Monthly": format_currency(results['total_operating_costs']/12)},
+                    {"Particulars": "Less: Interest", "Annual": format_currency(results['annual_interest']), "Monthly": format_currency(results['annual_interest']/12)},
+                    {"Particulars": "Less: Depreciation", "Annual": format_currency(results['annual_depreciation']), "Monthly": format_currency(results['annual_depreciation']/12)},
+                    {"Particulars": "Less: Tax", "Annual": format_currency(results['tax_amount']), "Monthly": format_currency(results['tax_amount']/12)},
+                    {"Particulars": "= PAT (Net Profit)", "Annual": format_currency(results['pat']), "Monthly": format_currency(results['pat']/12)},
+                    {"Particulars": "---", "Annual": "---", "Monthly": "---"},
+                    {"Particulars": "Less: Loan Principal", "Annual": format_currency(results['annual_loan_payment'] - results['annual_interest']), "Monthly": format_currency((results['annual_loan_payment'] - results['annual_interest'])/12)},
+                    {"Particulars": "**= Cash After EMI**", "Annual": format_currency(results['pat'] - (results['annual_loan_payment'] - results['annual_interest'])), "Monthly": format_currency((results['pat'] - (results['annual_loan_payment'] - results['annual_interest']))/12)},
+                ])
+                st.dataframe(cash_flow_detail, width='stretch', hide_index=True)
+                
+                # Status indicator
+                annual_cash_after_emi = results['pat'] - (results['annual_loan_payment'] - results['annual_interest'])
+                if annual_cash_after_emi > results['annual_loan_payment'] * 0.2:  # 20% buffer
+                    st.success(f"✅ **Healthy:** Good cash buffer after EMI payments")
+                elif annual_cash_after_emi > 0:
+                    st.warning(f"⚠️ **Tight:** Limited cash buffer. Monitor carefully.")
+                else:
+                    st.error(f"❌ **Critical:** Cannot cover EMI from profits! Needs restructuring.")
     
     st.markdown("---")
     
@@ -1951,6 +2207,28 @@ def main():
             {"Product": "**Total Revenue**", "Amount": format_currency(results['total_annual_revenue']/period_divisor)},
         ])
         st.dataframe(revenue_details, width='stretch', hide_index=True)
+        
+        # Add EMI and Net Profit Summary
+        st.markdown(f"**{period_label} Loan Repayment & Final Profit**")
+        emi_summary = pd.DataFrame([
+            {"Particulars": "Total Revenue", "Amount": format_currency(results['total_annual_revenue']/period_divisor)},
+            {"Particulars": "Less: Operating Costs", "Amount": format_currency(results['total_operating_costs']/period_divisor)},
+            {"Particulars": "Less: Depreciation", "Amount": format_currency(results['annual_depreciation']/period_divisor)},
+            {"Particulars": "Less: Interest (EMI portion)", "Amount": format_currency(results['annual_interest']/period_divisor)},
+            {"Particulars": "Less: Tax", "Amount": format_currency(results['tax_amount']/period_divisor)},
+            {"Particulars": "= PAT (Net Profit)", "Amount": format_currency(results['pat']/period_divisor)},
+            {"Particulars": "---", "Amount": "---"},
+            {"Particulars": "Less: Loan Principal (EMI)", "Amount": format_currency((results['annual_loan_payment'] - results['annual_interest'])/period_divisor)},
+            {"Particulars": "**= Net Cash After EMI**", "Amount": format_currency((results['pat'] - (results['annual_loan_payment'] - results['annual_interest']))/period_divisor)},
+        ])
+        st.dataframe(emi_summary, width='stretch', hide_index=True)
+        
+        # Visual indicator
+        net_cash_after_emi = results['pat'] - (results['annual_loan_payment'] - results['annual_interest'])
+        if net_cash_after_emi > 0:
+            st.success(f"✅ **Positive Cash Flow:** {format_currency(net_cash_after_emi/period_divisor)} available after all expenses & EMI")
+        else:
+            st.error(f"⚠️ **Negative Cash Flow:** Shortfall of {format_currency(abs(net_cash_after_emi)/period_divisor)} - Unable to service EMI!")
     
     with col2:
         st.plotly_chart(create_cost_breakdown_chart(results, period_divisor, period_label), width='stretch')
@@ -1982,23 +2260,62 @@ def main():
     # ===== PROFITABILITY ANALYSIS =====
     st.markdown(f'<div class="section-header">💹 Profitability Analysis ({period_label})</div>', unsafe_allow_html=True)
     
+    # Add glossary expander at the top
+    with st.expander("📚 Financial Terms Glossary - Click to understand key metrics", expanded=False):
+        glossary = get_financial_glossary()
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("### 💰 Profitability Metrics")
+            for term in ["Gross Profit", "EBITDA", "EBIT", "PBT", "PAT"]:
+                info = glossary[term]
+                st.markdown(f"**{term}** ({info['short']})")
+                st.markdown(f"_{info['definition']}_")
+                st.markdown(f"📐 **Formula:** `{info['formula']}`")
+                st.markdown(f"💡 **Example:** {info['example']}")
+                if 'why_important' in info:
+                    st.markdown(f"⭐ **Why Important:** {info['why_important']}")
+                st.markdown("---")
+        
+        with col2:
+            st.markdown("### 📊 Key Financial Indicators")
+            for term in ["ROI", "Break-even Point", "Debt-Equity Ratio", "Working Capital", "Cash Flow", "Margin"]:
+                info = glossary[term]
+                st.markdown(f"**{term}** ({info['short']})")
+                st.markdown(f"_{info['definition']}_")
+                st.markdown(f"📐 **Formula:** `{info['formula']}`")
+                st.markdown(f"💡 **Example:** {info['example']}")
+                if 'why_important' in info:
+                    st.markdown(f"⭐ **Why Important:** {info['why_important']}")
+                st.markdown("---")
+    
+    st.markdown("")  # Spacing
+    
     col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
-        st.metric("Gross Profit", format_currency(results['gross_profit']/period_divisor))
+        st.metric("Gross Profit", format_currency(results['gross_profit']/period_divisor),
+                 help="Revenue minus Operating Costs. Shows basic operational profitability.")
     with col2:
-        st.metric("EBITDA", format_currency(results['ebitda']/period_divisor))
+        st.metric("EBITDA", format_currency(results['ebitda']/period_divisor),
+                 help="Earnings Before Interest, Tax, Depreciation & Amortization. Shows core operating performance.")
     with col3:
-        st.metric("EBIT", format_currency(results['ebit']/period_divisor))
+        st.metric("EBIT", format_currency(results['ebit']/period_divisor),
+                 help="Earnings Before Interest & Tax (EBITDA - Depreciation). Operating profit after accounting for asset wear.")
     with col4:
-        st.metric("PBT", format_currency(results['pbt']/period_divisor))
+        st.metric("PBT", format_currency(results['pbt']/period_divisor),
+                 help="Profit Before Tax (EBIT - Interest). Profit after all expenses except income tax.")
     with col5:
-        st.metric("PAT (Net Profit)", format_currency(results['pat']/period_divisor))
+        st.metric("PAT (Net Profit)", format_currency(results['pat']/period_divisor),
+                 help="Profit After Tax. The actual profit you keep after all expenses, interest, and taxes. This is your 'bottom line'.")
     
     # Profitability waterfall - now shows for both monthly and annual
     st.plotly_chart(create_profitability_waterfall(results, period_divisor, period_label), width='stretch')
     
     # Profit & Loss Statement
     with st.expander(f"📄 Detailed Profit & Loss Statement ({period_label})"):
+        st.info("💡 **Reading P&L Statement:** This shows how we arrive at final profit (PAT) from revenue. Each line deducts different types of costs/expenses.")
+        
         pl_data = [
             {"Particulars": "Revenue from Operations", "Amount (₹)": format_currency(results['total_annual_revenue']/period_divisor)},
             {"Particulars": "Less: Operating Expenses", "Amount (₹)": format_currency(results['total_operating_costs']/period_divisor)},
@@ -2015,6 +2332,21 @@ def main():
         ]
         pl_df = pd.DataFrame(pl_data)
         st.dataframe(pl_df, width='stretch', hide_index=True)
+        
+        # Add explanation
+        st.markdown("""
+        **Understanding the Flow:**
+        - **Revenue** - Total income from selling rice, bran, husk, and broken rice
+        - **Operating Expenses** - Day-to-day costs (paddy, salaries, utilities, etc.)
+        - **EBITDA** - Operating profit before accounting decisions
+        - **Depreciation** - Asset value reduction (non-cash expense)
+        - **EBIT** - Operating profit after depreciation
+        - **Interest** - Cost of borrowing (EMI interest portion)
+        - **PBT** - Profit before government tax
+        - **Tax** - Income tax paid to government
+        - **PAT** - Your final profit! This is what you actually earn
+        - **Cash Flow** - Actual cash available (PAT + Depreciation - Loan Principal)
+        """)
     
     st.markdown("---")
     
@@ -2025,24 +2357,33 @@ def main():
     
     with col1:
         st.markdown("**Profitability Ratios**")
-        st.metric("Gross Margin", format_percentage(results['gross_margin']))
-        st.metric("EBITDA Margin", format_percentage(results['ebitda_margin']))
-        st.metric("Net Profit Margin", format_percentage(results['net_margin']))
+        st.metric("Gross Margin", format_percentage(results['gross_margin']),
+                 help="Gross Profit as % of Revenue. Shows how much profit you make before interest, tax, and depreciation.")
+        st.metric("EBITDA Margin", format_percentage(results['ebitda_margin']),
+                 help="EBITDA as % of Revenue. Indicates operational efficiency - higher is better (industry avg: 15-20%).")
+        st.metric("Net Profit Margin", format_percentage(results['net_margin']),
+                 help="PAT as % of Revenue. Your final profit after ALL expenses. This is the 'bottom line' percentage (target: 10-15%).")
     
     with col2:
         st.markdown("**Investment Returns**")
-        st.metric("Annual ROI", format_percentage(results['roi_percent']))
+        st.metric("Annual ROI", format_percentage(results['roi_percent']),
+                 help="Return on Investment: How much profit you earn per year as % of total investment. Higher ROI = better returns (target: 15-25%).")
         if results['payback_years']:
-            st.metric("Payback Period", f"{results['payback_years']:.1f} years")
+            st.metric("Payback Period", f"{results['payback_years']:.1f} years",
+                     help="Time needed to recover your initial investment from profits. Shorter is better (ideal: 3-5 years).")
         else:
-            st.metric("Payback Period", "N/A")
+            st.metric("Payback Period", "N/A",
+                     help="Time needed to recover your initial investment from profits.")
     
     with col3:
         st.markdown("**Break-even Analysis**")
-        st.metric("Break-even Volume", f"{format_indian_number(results['breakeven_kg'])} kg rice")
-        st.metric("Break-even Revenue", format_currency(results['breakeven_revenue']))
+        st.metric("Break-even Volume", f"{format_indian_number(results['breakeven_kg'])} kg rice",
+                 help="Minimum rice production needed to cover all costs (zero profit, zero loss). Below this = losses, above = profits.")
+        st.metric("Break-even Revenue", format_currency(results['breakeven_revenue']),
+                 help="Minimum revenue needed to cover all costs. This is your safety threshold.")
         capacity_utilization = (results['breakeven_kg'] / results['rice_kg_year'] * 100) if results['rice_kg_year'] > 0 else 0
-        st.metric("Break-even Capacity %", f"{capacity_utilization:.1f}%")
+        st.metric("Break-even Capacity %", f"{capacity_utilization:.1f}%",
+                 help="Percentage of full capacity needed to break even. Lower is safer (ideal: below 60%).")
     
     with st.expander("📊 Additional Cost Analytics"):
         st.write(f"**Revenue per kg of Rice (incl. by-products):** {format_currency(results['revenue_per_kg_rice'])}")
