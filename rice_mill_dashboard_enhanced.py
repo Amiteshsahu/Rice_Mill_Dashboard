@@ -68,6 +68,24 @@ def format_percentage(x):
     return f"{x:.1f}%"
 
 
+def format_indian_number(num):
+    """Format number with Indian comma system"""
+    num = int(num)
+    s = str(num)
+    if len(s) <= 3:
+        return s
+    result = s[-3:]
+    s = s[:-3]
+    while s:
+        if len(s) <= 2:
+            result = s + "," + result
+            break
+        else:
+            result = s[-2:] + "," + result
+            s = s[:-2]
+    return result
+
+
 def get_financial_glossary():
     """Return dictionary of financial terms and their definitions"""
     return {
@@ -1467,6 +1485,472 @@ def create_projection_chart(yearly_data):
     return fig
 
 
+def create_kpi_gauge_chart(value, title, max_value, thresholds, unit=""):
+    """Create beautiful nature-themed gauge chart for KPIs"""
+    fig = go.Figure(go.Indicator(
+        mode="gauge+number+delta",
+        value=value,
+        domain={'x': [0, 1], 'y': [0, 1]},
+        title={'text': title, 'font': {'size': 18, 'color': '#2d5016'}},
+        number={'suffix': unit, 'font': {'size': 32, 'color': '#2d5016'}},
+        gauge={
+            'axis': {'range': [None, max_value], 'tickwidth': 1, 'tickcolor': "#4a7c33"},
+            'bar': {'color': "#6fb33e"},
+            'bgcolor': "rgba(220, 237, 200, 0.3)",
+            'borderwidth': 2,
+            'bordercolor': "#4a7c33",
+            'steps': [
+                {'range': [0, thresholds[0]], 'color': '#ffcccb'},
+                {'range': [thresholds[0], thresholds[1]], 'color': '#fffacd'},
+                {'range': [thresholds[1], max_value], 'color': '#c8e6c9'}
+            ],
+            'threshold': {
+                'line': {'color': "#2d5016", 'width': 4},
+                'thickness': 0.75,
+                'value': value
+            }
+        }
+    ))
+    
+    fig.update_layout(
+        height=250,
+        margin=dict(l=20, r=20, t=60, b=20),
+        paper_bgcolor='rgba(255, 255, 255, 0.8)',
+        font={'color': "#2d5016", 'family': "Quicksand"}
+    )
+    
+    return fig
+
+
+def create_performance_radar_chart(metrics_dict):
+    """Create radar chart for performance metrics"""
+    categories = list(metrics_dict.keys())
+    values = list(metrics_dict.values())
+    
+    fig = go.Figure()
+    
+    fig.add_trace(go.Scatterpolar(
+        r=values,
+        theta=categories,
+        fill='toself',
+        fillcolor='rgba(111, 179, 62, 0.3)',
+        line=dict(color='#4a7c33', width=2),
+        marker=dict(size=8, color='#2d5016'),
+        name='Performance'
+    ))
+    
+    # Add industry benchmark
+    benchmark_values = [80] * len(categories)  # 80% as benchmark
+    fig.add_trace(go.Scatterpolar(
+        r=benchmark_values,
+        theta=categories,
+        fill='toself',
+        fillcolor='rgba(200, 200, 200, 0.1)',
+        line=dict(color='gray', width=2, dash='dash'),
+        name='Industry Benchmark'
+    ))
+    
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[0, 100],
+                tickfont=dict(color='#2d5016'),
+                gridcolor='rgba(74, 124, 51, 0.3)'
+            ),
+            angularaxis=dict(
+                tickfont=dict(color='#2d5016', size=11)
+            ),
+            bgcolor='rgba(220, 237, 200, 0.2)'
+        ),
+        showlegend=True,
+        title={
+            'text': "🎯 Performance Scorecard",
+            'font': {'size': 20, 'color': '#2d5016', 'family': 'Poppins'},
+            'x': 0.5,
+            'xanchor': 'center'
+        },
+        height=450,
+        paper_bgcolor='rgba(255, 255, 255, 0.8)',
+        font=dict(family="Quicksand", color="#2d5016")
+    )
+    
+    return fig
+
+
+def create_cost_sunburst_chart(cost_breakdown):
+    """Create sunburst chart for hierarchical cost breakdown"""
+    labels = []
+    parents = []
+    values = []
+    colors = []
+    
+    # Root
+    labels.append("Total Costs")
+    parents.append("")
+    values.append(sum(cost_breakdown.values()))
+    colors.append("#4a7c33")
+    
+    # Main categories
+    color_palette = ["#6fb33e", "#8bc34a", "#aed581", "#c5e1a5", "#dcedc8"]
+    for idx, (category, value) in enumerate(cost_breakdown.items()):
+        labels.append(category)
+        parents.append("Total Costs")
+        values.append(value)
+        colors.append(color_palette[idx % len(color_palette)])
+    
+    fig = go.Figure(go.Sunburst(
+        labels=labels,
+        parents=parents,
+        values=values,
+        branchvalues="total",
+        marker=dict(colors=colors, line=dict(color='white', width=2)),
+        hovertemplate='<b>%{label}</b><br>Amount: ₹%{value:,.0f}<br>Percentage: %{percentParent}<extra></extra>'
+    ))
+    
+    fig.update_layout(
+        title={
+            'text': "🌳 Cost Distribution Tree",
+            'font': {'size': 20, 'color': '#2d5016', 'family': 'Poppins'},
+            'x': 0.5,
+            'xanchor': 'center'
+        },
+        height=500,
+        paper_bgcolor='rgba(255, 255, 255, 0.8)',
+        font=dict(family="Quicksand", color="#2d5016", size=12)
+    )
+    
+    return fig
+
+
+def create_sensitivity_heatmap(base_pat, inputs, results):
+    """Create sensitivity analysis heatmap"""
+    # Variables to test
+    sale_price_range = np.linspace(inputs['sale_price_per_kg'] * 0.85, inputs['sale_price_per_kg'] * 1.15, 7)
+    
+    # Convert paddy price from per quintal to per kg
+    paddy_price_per_kg = inputs['paddy_price_per_quintal'] / 100  # 1 quintal = 100 kg
+    paddy_price_range = np.linspace(paddy_price_per_kg * 0.85, paddy_price_per_kg * 1.15, 7)
+    
+    # Calculate PAT for each combination
+    pat_matrix = []
+    for paddy_price in paddy_price_range:
+        row = []
+        for sale_price in sale_price_range:
+            # Recalculate revenue and costs
+            new_revenue = results['rice_kg_year'] * sale_price
+            # Calculate new paddy cost: convert paddy_price back to per quintal equivalent
+            new_paddy_cost = results['paddy_tonnes_year'] * 10 * (paddy_price * 100)  # tonnes to quintals, kg price to quintal price
+            cost_difference = new_paddy_cost - results['annual_paddy_cost']
+            new_pat = base_pat + (new_revenue - results['total_annual_revenue']) - cost_difference
+            row.append(new_pat / 10000000)  # Convert to crores
+        pat_matrix.append(row)
+    
+    # Create labels
+    sale_labels = [f"₹{p:.1f}" for p in sale_price_range]
+    paddy_labels = [f"₹{p:.1f}" for p in paddy_price_range]
+    
+    fig = go.Figure(data=go.Heatmap(
+        z=pat_matrix,
+        x=sale_labels,
+        y=paddy_labels,
+        colorscale=[
+            [0, '#d32f2f'],      # Dark red for losses
+            [0.3, '#ff6f00'],    # Orange for low profit
+            [0.5, '#ffd54f'],    # Yellow for moderate
+            [0.7, '#aed581'],    # Light green for good
+            [1, '#4a7c33']       # Dark green for excellent
+        ],
+        hovertemplate='Sale: %{x}<br>Paddy: %{y}<br>PAT: ₹%{z:.2f} Cr<extra></extra>',
+        colorbar=dict(
+            title=dict(text="PAT (₹ Cr)", font=dict(color='#2d5016')),
+            tickfont=dict(color='#2d5016')
+        )
+    ))
+    
+    # Add base case marker
+    base_sale_idx = 3  # Middle value
+    base_paddy_idx = 3
+    fig.add_trace(go.Scatter(
+        x=[sale_labels[base_sale_idx]],
+        y=[paddy_labels[base_paddy_idx]],
+        mode='markers',
+        marker=dict(size=15, color='white', symbol='star', line=dict(color='#2d5016', width=2)),
+        name='Base Case',
+        showlegend=True
+    ))
+    
+    fig.update_layout(
+        title={
+            'text': "🔍 Sensitivity Analysis: PAT Impact Matrix",
+            'font': {'size': 20, 'color': '#2d5016', 'family': 'Poppins'},
+            'x': 0.5,
+            'xanchor': 'center'
+        },
+        xaxis_title="Rice Sale Price (per kg)",
+        yaxis_title="Paddy Purchase Price (per kg)",
+        height=500,
+        paper_bgcolor='rgba(255, 255, 255, 0.8)',
+        font=dict(family="Quicksand", color="#2d5016"),
+        xaxis=dict(tickfont=dict(color='#2d5016')),
+        yaxis=dict(tickfont=dict(color='#2d5016'))
+    )
+    
+    return fig
+
+
+def create_scenario_comparison_chart(scenarios):
+    """Create comparison chart for different scenarios"""
+    scenario_names = list(scenarios.keys())
+    metrics = ['Revenue', 'EBITDA', 'PAT', 'ROI %']
+    
+    fig = go.Figure()
+    
+    colors = ['#4a7c33', '#6fb33e', '#8bc34a']
+    
+    for idx, (scenario_name, values) in enumerate(scenarios.items()):
+        fig.add_trace(go.Bar(
+            name=scenario_name,
+            x=metrics,
+            y=values,
+            marker_color=colors[idx],
+            text=[format_currency(v) if i < 3 else f"{v:.1f}%" for i, v in enumerate(values)],
+            textposition='outside',
+            hovertemplate='<b>%{x}</b><br>%{text}<extra></extra>'
+        ))
+    
+    fig.update_layout(
+        title={
+            'text': "📊 Scenario Planning: Best, Base & Worst Cases",
+            'font': {'size': 20, 'color': '#2d5016', 'family': 'Poppins'},
+            'x': 0.5,
+            'xanchor': 'center'
+        },
+        barmode='group',
+        height=450,
+        paper_bgcolor='rgba(255, 255, 255, 0.8)',
+        plot_bgcolor='rgba(220, 237, 200, 0.2)',
+        font=dict(family="Quicksand", color="#2d5016"),
+        xaxis=dict(tickfont=dict(size=12, color='#2d5016')),
+        yaxis=dict(title="Amount (₹) / Percentage (%)", tickfont=dict(color='#2d5016')),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="center",
+            x=0.5,
+            bgcolor='rgba(255, 255, 255, 0.8)'
+        ),
+        showlegend=True
+    )
+    
+    return fig
+
+
+def calculate_advanced_metrics(results, inputs):
+    """Calculate advanced business metrics"""
+    metrics = {}
+    
+    # Calculate total capital cost from inputs
+    total_capital_cost = results.get('total_project_cost', 0)
+    equity = results.get('equity_amount', total_capital_cost * 0.3)
+    
+    # Operating efficiency metrics
+    metrics['capacity_utilization'] = 85  # Assumed 85% for 5 TPH running 300 days
+    metrics['asset_turnover'] = results['total_annual_revenue'] / total_capital_cost if total_capital_cost > 0 else 0
+    metrics['working_capital_days'] = (inputs.get('working_capital', 200000) / results['total_annual_revenue'] * 365) if results['total_annual_revenue'] > 0 else 0
+    
+    # Profitability metrics
+    metrics['gross_profit_margin'] = (results['gross_profit'] / results['total_annual_revenue'] * 100) if results['total_annual_revenue'] > 0 else 0
+    metrics['ebitda_margin'] = (results['ebitda'] / results['total_annual_revenue'] * 100) if results['total_annual_revenue'] > 0 else 0
+    metrics['net_profit_margin'] = (results['pat'] / results['total_annual_revenue'] * 100) if results['total_annual_revenue'] > 0 else 0
+    
+    # Return metrics
+    metrics['roce'] = (results['ebit'] / total_capital_cost * 100) if total_capital_cost > 0 else 0
+    metrics['roe'] = (results['pat'] / equity * 100) if equity > 0 else 0
+    
+    # Cash flow metrics
+    metrics['operating_cash_flow'] = results['ebitda']
+    metrics['free_cash_flow'] = results['ebitda'] - results.get('annual_loan_payment', 0)
+    
+    # Debt metrics
+    if inputs.get('loan_amount', 0) > 0:
+        metrics['debt_to_equity'] = inputs['loan_amount'] / equity if equity > 0 else 0
+        metrics['interest_coverage'] = results['ebit'] / results.get('interest', 1) if results.get('interest', 0) > 0 else 0
+    else:
+        metrics['debt_to_equity'] = 0
+        metrics['interest_coverage'] = 999  # No debt
+    
+    # Efficiency ratios
+    metrics['revenue_per_tph'] = results['total_annual_revenue'] / 5  # 5 TPH capacity
+    metrics['profit_per_kg'] = results['pat'] / results['rice_kg_year'] if results['rice_kg_year'] > 0 else 0
+    
+    return metrics
+
+
+def generate_advanced_ai_insights(results, inputs, metrics):
+    """Generate comprehensive AI-powered business insights"""
+    insights = []
+    
+    # 1. Profitability Optimization
+    if metrics['net_profit_margin'] < 12:
+        profit_gap = (0.12 * results['total_annual_revenue']) - results['pat']
+        insights.append({
+            'category': '💰 Profitability Enhancement',
+            'priority': 'HIGH',
+            'insight': f"Your net margin of {metrics['net_profit_margin']:.1f}% is below the 12% industry benchmark. You need an additional {format_currency(profit_gap)} to reach optimal profitability.",
+            'recommendations': [
+                f"**Price Optimization**: Increase rice price by ₹{profit_gap/results['rice_kg_year']:.2f}/kg to bridge the gap",
+                "**Premium Product Mix**: Introduce branded/organic rice with 20-30% higher margins",
+                "**Volume Strategy**: Increase capacity utilization from current to 90%+ through better market reach",
+                "**By-product Maximization**: Ensure bran and husk sales are optimized (should contribute 5-8% of revenue)"
+            ],
+            'impact': f"Achieving 12% margin would increase annual PAT by {format_currency(profit_gap)}"
+        })
+    
+    # 2. Cost Structure Analysis
+    paddy_cost_percent = (results['annual_paddy_cost'] / results['total_annual_revenue'] * 100)
+    if paddy_cost_percent > 75:
+        insights.append({
+            'category': '🌾 Raw Material Cost Management',
+            'priority': 'MEDIUM',
+            'insight': f"Paddy costs are {paddy_cost_percent:.1f}% of revenue (optimal: 70-75%). This indicates pricing pressure or high procurement costs.",
+            'recommendations': [
+                "**Contract Farming**: Lock in paddy prices with farmers for 6-12 months ahead",
+                "**Bulk Procurement**: Negotiate volume discounts during harvest season",
+                "**Quality Grading**: Implement strict quality control to reduce processing losses",
+                "**Alternative Sourcing**: Diversify procurement across multiple regions to balance prices"
+            ],
+            'impact': "Reducing paddy cost by 3-5% could increase PAT by " + format_currency(results['total_annual_revenue'] * 0.04)
+        })
+    
+    # 3. Capacity Utilization
+    if metrics['capacity_utilization'] < 80:
+        potential_revenue = (results['total_annual_revenue'] / metrics['capacity_utilization'] * 90) - results['total_annual_revenue']
+        insights.append({
+            'category': '⚡ Capacity Optimization',
+            'priority': 'HIGH',
+            'insight': f"Operating at {metrics['capacity_utilization']}% capacity. Increasing to 90% could add {format_currency(potential_revenue)} in revenue.",
+            'recommendations': [
+                "**Extended Operating Hours**: Add second shift or weekend operations",
+                "**Customer Acquisition**: Target institutional buyers (hotels, caterers, retail chains)",
+                "**Contract Processing**: Offer milling services to other traders/farmers",
+                "**Geographic Expansion**: Reach new markets within 100-200 km radius"
+            ],
+            'impact': f"At 90% utilization: Additional profit of ~{format_currency(potential_revenue * 0.15)}"
+        })
+    
+    # 4. Working Capital Efficiency
+    if metrics['working_capital_days'] > 60:
+        insights.append({
+            'category': '💵 Cash Flow Optimization',
+            'priority': 'MEDIUM',
+            'insight': f"Working capital cycle of {metrics['working_capital_days']:.0f} days ties up cash. Reducing to 45 days would free up {format_currency(results['total_annual_revenue'] / 365 * 15)}.",
+            'recommendations': [
+                "**Inventory Management**: Implement just-in-time paddy procurement",
+                "**Receivables**: Offer 2-3% discount for advance/immediate payment",
+                "**Payables**: Negotiate 30-day credit terms with paddy suppliers",
+                "**Production Planning**: Align production with confirmed orders"
+            ],
+            'impact': "Better cash management reduces dependency on working capital loans"
+        })
+    
+    # 5. Technology & Automation
+    insights.append({
+        'category': '🤖 Technology Upgrade Path',
+        'priority': 'MEDIUM',
+        'insight': "Modern automation can improve recovery rates by 1-2% and reduce labor costs by 15-20%.",
+        'recommendations': [
+            "**Automated Color Sorters**: Improve rice quality and reduce rejections (ROI: 18-24 months)",
+            "**Electronic Weighing Systems**: Reduce measurement errors and pilferage",
+            "**ERP Software**: Implement inventory and financial management system",
+            "**Quality Testing Lab**: Invest in moisture meters and purity testing equipment"
+        ],
+        'impact': f"1% recovery improvement = Additional {format_currency(results['rice_kg_year'] * inputs['sale_price_per_kg'] * 0.01)} revenue"
+    })
+    
+    # 6. Market Positioning
+    if metrics['net_profit_margin'] > 12:
+        insights.append({
+            'category': '🎯 Market Leadership Strategy',
+            'priority': 'LOW',
+            'insight': f"Your strong {metrics['net_profit_margin']:.1f}% margin indicates competitive advantage. Time to scale.",
+            'recommendations': [
+                "**Brand Building**: Register trademark and develop packaging",
+                "**Quality Certifications**: Get ISO 22000, FSSAI, organic certification",
+                "**Retail Presence**: Move from wholesale to branded retail (30-40% better margins)",
+                "**Export Opportunities**: Explore international markets (Middle East, Africa)"
+            ],
+            'impact': "Brand premium of even ₹2/kg = Additional " + format_currency(results['rice_kg_year'] * 2)
+        })
+    
+    # 7. Risk Management
+    insights.append({
+        'category': '⚠️ Risk Mitigation',
+        'priority': 'HIGH',
+        'insight': "Rice milling has seasonal and market risks. Diversification and hedging are crucial.",
+        'recommendations': [
+            "**Product Diversification**: Don't depend on single rice variety (60-70% max)",
+            "**Price Hedging**: Use futures market or fixed-price contracts to hedge 40-50% volume",
+            "**Geographic Spread**: Source paddy from at least 3 different regions",
+            "**Customer Mix**: Avoid single customer >25% of revenue",
+            "**Financial Buffer**: Maintain 3-4 months operating expense as reserve"
+        ],
+        'impact': "Risk management prevents potential losses during adverse market conditions"
+    })
+    
+    # 8. Sustainability & Green Initiatives
+    insights.append({
+        'category': '🌱 Sustainability & Cost Savings',
+        'priority': 'LOW',
+        'insight': "Green initiatives can reduce costs while improving brand value.",
+        'recommendations': [
+            "**Solar Power**: Install solar panels (ROI: 4-5 years, saves 30-40% electricity)",
+            "**Husk Power**: Use rice husk for boiler fuel instead of selling at low prices",
+            "**Water Recycling**: Implement water treatment and recycling system",
+            "**Organic Certification**: Premium positioning with 25-40% price advantage"
+        ],
+        'impact': f"Solar power alone could save {format_currency(results.get('annual_electricity_cost', 500000) * 0.35)} annually"
+    })
+    
+    return insights
+
+
+def calculate_scenario_analysis(inputs, results):
+    """Calculate best case, base case, and worst case scenarios"""
+    scenarios = {}
+    
+    total_capital_cost = results.get('total_project_cost', 0)
+    
+    # Base Case (current)
+    scenarios['Base Case'] = [
+        results['total_annual_revenue'],
+        results['ebitda'],
+        results['pat'],
+        results.get('roi_percentage', 0)
+    ]
+    
+    # Best Case (+15% price, +10% volume, -5% costs)
+    best_revenue = results['total_annual_revenue'] * 1.15 * 1.10
+    best_costs = results['total_operating_costs'] * 0.95
+    best_ebitda = best_revenue - best_costs
+    best_pat = (best_ebitda - results.get('depreciation', 0) - results.get('interest', 0)) * 0.7
+    best_roi = (best_pat / total_capital_cost * 100) if total_capital_cost > 0 else 0
+    
+    scenarios['Best Case'] = [best_revenue, best_ebitda, best_pat, best_roi]
+    
+    # Worst Case (-10% price, -15% volume, +10% costs)
+    worst_revenue = results['total_annual_revenue'] * 0.90 * 0.85
+    worst_costs = results['total_operating_costs'] * 1.10
+    worst_ebitda = worst_revenue - worst_costs
+    worst_pat = (worst_ebitda - results.get('depreciation', 0) - results.get('interest', 0)) * 0.7
+    worst_roi = (worst_pat / total_capital_cost * 100) if total_capital_cost > 0 else 0
+    
+    scenarios['Worst Case'] = [worst_revenue, worst_ebitda, worst_pat, worst_roi]
+    
+    return scenarios
+
+
 def main():
     st.set_page_config(
         page_title="🌾 5 TPH Rice Mill - Nature's Bounty Financial Dashboard",
@@ -1853,6 +2337,215 @@ def main():
         
         ::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(135deg, #689f38 0%, #7cb342 100%);
+        }
+        
+        /* Enhanced Analytics Section Styling */
+        .analytics-header {
+            background: linear-gradient(135deg, #7cb342 0%, #9ccc65 50%, #aed581 100%);
+            padding: 1.5rem 2rem;
+            border-radius: 15px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.8rem;
+            text-align: center;
+            box-shadow: 0 6px 25px rgba(124, 179, 66, 0.35);
+            margin: 2rem 0;
+            animation: slideIn 0.8s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* KPI Card Styling */
+        .kpi-card {
+            background: linear-gradient(135deg, #ffffff 0%, #e8f5e9 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.2);
+            border-top: 4px solid #66bb6a;
+            transition: all 0.3s ease;
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 30px rgba(76, 175, 80, 0.3);
+        }
+        
+        /* Priority Badges */
+        .priority-high {
+            background: linear-gradient(135deg, #ef5350 0%, #f44336 100%);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-block;
+            box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+        }
+        
+        .priority-medium {
+            background: linear-gradient(135deg, #ffb74d 0%, #ffa726 100%);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-block;
+            box-shadow: 0 2px 8px rgba(255, 167, 38, 0.3);
+        }
+        
+        .priority-low {
+            background: linear-gradient(135deg, #66bb6a 0%, #4caf50 100%);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-block;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+        }
+        
+        /* Gauge Chart Container */
+        .gauge-container {
+            background: linear-gradient(135deg, #f1f8e9 0%, #e8f5e9 100%);
+            border-radius: 15px;
+            padding: 1rem;
+            box-shadow: 0 3px 15px rgba(124, 179, 66, 0.15);
+            margin: 0.5rem 0;
+        }
+        
+        /* Insight Card */
+        .insight-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f9fbe7 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 5px solid #cddc39;
+            box-shadow: 0 3px 15px rgba(205, 220, 57, 0.2);
+        }
+        
+        /* Scenario Cards */
+        .scenario-best {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border: 2px solid #66bb6a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(102, 187, 106, 0.25);
+        }
+        
+        .scenario-base {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 2px solid #42a5f5;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(66, 165, 245, 0.25);
+        }
+        
+        .scenario-worst {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            border: 2px solid #ef5350;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(239, 83, 80, 0.25);
+        }
+        
+        /* Heatmap Legend */
+        .heatmap-legend {
+            background: linear-gradient(90deg, #d32f2f 0%, #ff6f00 20%, #ffd54f 50%, #aed581 70%, #4a7c33 100%);
+            height: 30px;
+            border-radius: 15px;
+            margin: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+        
+        /* Animated Background Elements */
+        @keyframes gentle-sway {
+            0%, 100% {
+                transform: rotate(-2deg);
+            }
+            50% {
+                transform: rotate(2deg);
+            }
+        }
+        
+        .nature-icon {
+            display: inline-block;
+            animation: gentle-sway 4s ease-in-out infinite;
+        }
+        
+        /* Multiselect Styling */
+        .stMultiSelect > div > div {
+            background: linear-gradient(135deg, #f1f8e9 0%, #e8f5e9 100%);
+            border-radius: 10px;
+            border: 2px solid #c5e1a5;
+        }
+        
+        /* Table Enhancements */
+        .sensitivity-table {
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .sensitivity-table th {
+            background: linear-gradient(135deg, #7cb342 0%, #8bc34a 100%);
+            color: white;
+            font-weight: 600;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .sensitivity-table td {
+            padding: 0.8rem;
+            text-align: center;
+            border-bottom: 1px solid #e8f5e9;
+        }
+        
+        .sensitivity-table tr:hover {
+            background-color: #f1f8e9;
+            transition: background-color 0.3s ease;
+        }
+        
+        /* Tooltip Enhancement */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            border-bottom: 1px dotted #7cb342;
+        }
+        
+        /* Pulse Animation for Important Metrics */
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        .pulse-metric {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        /* Nature-themed Divider */
+        .nature-divider {
+            text-align: center;
+            margin: 2rem 0;
+            font-size: 1.5rem;
+            opacity: 0.7;
+            letter-spacing: 15px;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -2417,6 +3110,413 @@ def main():
             file_name="rice_mill_5year_detailed_projection.csv",
             mime="text/csv",
         )
+    
+    st.markdown("---")
+    
+    # ===== ADVANCED BUSINESS ANALYTICS =====
+    st.markdown('<div class="section-header">📊 Advanced Business Analytics & Intelligence</div>', unsafe_allow_html=True)
+    st.markdown("*Comprehensive analytics to drive data-driven decisions and optimize your rice mill operations*")
+    
+    # Calculate advanced metrics
+    advanced_metrics = calculate_advanced_metrics(results, inputs)
+    
+    # Create tabs for different analytics sections
+    analytics_tab1, analytics_tab2, analytics_tab3, analytics_tab4 = st.tabs([
+        "🎯 KPI Dashboard",
+        "🔍 Sensitivity Analysis", 
+        "📈 Scenario Planning",
+        "⚡ Performance Insights"
+    ])
+    
+    with analytics_tab1:
+        st.markdown("### Key Performance Indicators - At a Glance")
+        st.markdown("*Monitor critical business metrics with visual gauges comparing against industry benchmarks*")
+        
+        # Create three columns for gauge charts
+        gauge_col1, gauge_col2, gauge_col3 = st.columns(3)
+        
+        with gauge_col1:
+            # Net Profit Margin Gauge
+            st.plotly_chart(
+                create_kpi_gauge_chart(
+                    value=advanced_metrics['net_profit_margin'],
+                    title="Net Profit Margin",
+                    max_value=25,
+                    thresholds=[8, 12],
+                    unit="%"
+                ),
+                use_container_width=True
+            )
+            st.markdown("**Industry Benchmark:** 12-15%")
+            if advanced_metrics['net_profit_margin'] >= 12:
+                st.success("✅ Above industry average!")
+            elif advanced_metrics['net_profit_margin'] >= 8:
+                st.warning("⚠️ Below average, improvement needed")
+            else:
+                st.error("❌ Critical: Urgent action required")
+        
+        with gauge_col2:
+            # ROCE Gauge
+            st.plotly_chart(
+                create_kpi_gauge_chart(
+                    value=advanced_metrics['roce'],
+                    title="Return on Capital Employed",
+                    max_value=40,
+                    thresholds=[15, 25],
+                    unit="%"
+                ),
+                use_container_width=True
+            )
+            st.markdown("**Industry Benchmark:** 20-25%")
+            if advanced_metrics['roce'] >= 20:
+                st.success("✅ Excellent capital efficiency!")
+            elif advanced_metrics['roce'] >= 15:
+                st.warning("⚠️ Moderate performance")
+            else:
+                st.error("❌ Poor capital utilization")
+        
+        with gauge_col3:
+            # Capacity Utilization Gauge
+            st.plotly_chart(
+                create_kpi_gauge_chart(
+                    value=advanced_metrics['capacity_utilization'],
+                    title="Capacity Utilization",
+                    max_value=100,
+                    thresholds=[70, 85],
+                    unit="%"
+                ),
+                use_container_width=True
+            )
+            st.markdown("**Target:** 85-90%")
+            if advanced_metrics['capacity_utilization'] >= 85:
+                st.success("✅ Optimal utilization!")
+            elif advanced_metrics['capacity_utilization'] >= 70:
+                st.warning("⚠️ Room for improvement")
+            else:
+                st.error("❌ Underutilized capacity")
+        
+        st.markdown("---")
+        
+        # Performance Radar Chart
+        st.markdown("### 🎯 Performance Scorecard")
+        st.markdown("*Comprehensive view of operational excellence across key dimensions*")
+        
+        performance_metrics = {
+            'Profitability': min((advanced_metrics['net_profit_margin'] / 15) * 100, 100),
+            'Efficiency': min((advanced_metrics['asset_turnover'] / 2) * 100, 100),
+            'Liquidity': min((advanced_metrics['capacity_utilization'] / 90) * 100, 100),
+            'Returns': min((advanced_metrics['roce'] / 25) * 100, 100),
+            'Growth': 80,  # Assumed based on projections
+            'Sustainability': 75  # Based on operational practices
+        }
+        
+        col_radar, col_metrics = st.columns([1.5, 1])
+        
+        with col_radar:
+            st.plotly_chart(create_performance_radar_chart(performance_metrics), use_container_width=True)
+        
+        with col_metrics:
+            st.markdown("#### 📋 Detailed Metrics")
+            st.metric("Asset Turnover", f"{advanced_metrics['asset_turnover']:.2f}x", 
+                     delta="Good" if advanced_metrics['asset_turnover'] > 1.5 else "Low")
+            st.metric("Profit per kg", f"₹{advanced_metrics['profit_per_kg']:.2f}",
+                     delta="Excellent" if advanced_metrics['profit_per_kg'] > 2 else "Average")
+            st.metric("Revenue per TPH", format_currency(advanced_metrics['revenue_per_tph']),
+                     help="Annual revenue generated per ton-per-hour capacity")
+            st.metric("Working Capital Days", f"{advanced_metrics['working_capital_days']:.0f} days",
+                     delta="Efficient" if advanced_metrics['working_capital_days'] < 45 else "High")
+            
+            if advanced_metrics['debt_to_equity'] > 0:
+                st.metric("Debt to Equity", f"{advanced_metrics['debt_to_equity']:.2f}",
+                         delta="Safe" if advanced_metrics['debt_to_equity'] < 2 else "High")
+                st.metric("Interest Coverage", f"{advanced_metrics['interest_coverage']:.1f}x",
+                         delta="Strong" if advanced_metrics['interest_coverage'] > 3 else "Weak")
+        
+        st.markdown("---")
+        
+        # Cost Distribution Sunburst
+        st.markdown("### 🌳 Cost Distribution Analysis")
+        st.markdown("*Hierarchical breakdown of your operational costs*")
+        
+        cost_breakdown = {
+            "Raw Materials (Paddy)": results['annual_paddy_cost'],
+            "Labor & Manpower": results.get('annual_manpower_cost', 600000),
+            "Utilities (Power & Water)": results.get('annual_utilities_cost', 800000),
+            "Maintenance & Repairs": results.get('annual_maintenance_cost', 300000),
+            "Other Operating Costs": results['total_operating_costs'] - results['annual_paddy_cost'] - 1700000
+        }
+        
+        col_sunburst, col_cost_insights = st.columns([1.5, 1])
+        
+        with col_sunburst:
+            st.plotly_chart(create_cost_sunburst_chart(cost_breakdown), use_container_width=True)
+        
+        with col_cost_insights:
+            st.markdown("#### 💡 Cost Insights")
+            total_costs = sum(cost_breakdown.values())
+            for category, value in cost_breakdown.items():
+                percentage = (value / total_costs * 100)
+                st.write(f"**{category}**")
+                st.progress(percentage / 100)
+                st.write(f"{format_currency(value)} ({percentage:.1f}%)")
+                st.write("")
+            
+            # Cost optimization tips
+            st.info("💡 **Quick Tip**: Raw material costs >75% of revenue indicate pricing pressure. Focus on procurement efficiency and premium product mix.")
+    
+    with analytics_tab2:
+        st.markdown("### 🔍 Sensitivity Analysis")
+        st.markdown("*Understand how changes in key variables impact your profitability*")
+        
+        st.plotly_chart(create_sensitivity_heatmap(results['pat'], inputs, results), use_container_width=True)
+        
+        st.markdown("---")
+        
+        # Sensitivity table
+        st.markdown("#### 📊 Key Sensitivity Insights")
+        
+        sens_col1, sens_col2 = st.columns(2)
+        
+        with sens_col1:
+            st.markdown("##### 💰 Impact of Price Changes")
+            price_scenarios = []
+            for change in [-10, -5, 0, 5, 10]:
+                new_price = inputs['sale_price_per_kg'] * (1 + change/100)
+                new_revenue = results['rice_kg_year'] * new_price
+                new_pat = results['pat'] + (new_revenue - results['total_annual_revenue']) * 0.7  # After tax
+                price_scenarios.append({
+                    'Change': f"{change:+d}%",
+                    'Sale Price': f"₹{new_price:.1f}/kg",
+                    'PAT': format_currency(new_pat),
+                    'PAT Change': f"{((new_pat - results['pat']) / results['pat'] * 100):+.1f}%" if results['pat'] > 0 else "N/A"
+                })
+            
+            df_price = pd.DataFrame(price_scenarios)
+            st.dataframe(df_price, hide_index=True, use_container_width=True)
+            
+            st.info("📌 **Key Insight**: A ±5% price change impacts PAT by approximately ±15-20%. Pricing power is critical.")
+        
+        with sens_col2:
+            st.markdown("##### 🌾 Impact of Paddy Cost Changes")
+            paddy_scenarios = []
+            paddy_price_per_kg = inputs['paddy_price_per_quintal'] / 100  # Convert quintal to kg
+            for change in [-10, -5, 0, 5, 10]:
+                new_paddy_price_per_kg = paddy_price_per_kg * (1 + change/100)
+                new_paddy_price_per_quintal = new_paddy_price_per_kg * 100
+                # Calculate new paddy cost
+                new_paddy_cost = results['paddy_tonnes_year'] * 10 * new_paddy_price_per_quintal
+                cost_diff = new_paddy_cost - results['annual_paddy_cost']
+                new_pat = results['pat'] - (cost_diff * 0.7)  # After tax
+                paddy_scenarios.append({
+                    'Change': f"{change:+d}%",
+                    'Paddy Price': f"₹{new_paddy_price_per_kg:.1f}/kg",
+                    'PAT': format_currency(new_pat),
+                    'PAT Change': f"{((new_pat - results['pat']) / results['pat'] * 100):+.1f}%" if results['pat'] > 0 else "N/A"
+                })
+            
+            df_paddy = pd.DataFrame(paddy_scenarios)
+            st.dataframe(df_paddy, hide_index=True, use_container_width=True)
+            
+            st.warning("⚠️ **Key Insight**: Paddy cost changes have significant impact. Implement hedging strategies and contract farming.")
+        
+        st.markdown("---")
+        
+        # Volume sensitivity
+        st.markdown("#### 📈 Capacity Utilization Impact")
+        
+        volume_scenarios = []
+        for util in [60, 70, 80, 85, 90, 95]:
+            new_production = results['rice_kg_year'] * (util / 85)
+            new_revenue = new_production * inputs['sale_price_per_kg']
+            new_variable_costs = (results['annual_paddy_cost'] / results['rice_kg_year']) * new_production
+            fixed_costs = results['total_operating_costs'] - results['annual_paddy_cost']
+            new_total_costs = new_variable_costs + fixed_costs
+            new_ebitda = new_revenue - new_total_costs
+            new_pat = (new_ebitda - results.get('depreciation', 0) - results.get('interest', 0)) * 0.7
+            
+            volume_scenarios.append({
+                'Capacity': f"{util}%",
+                'Production': f"{format_indian_number(int(new_production))} kg",
+                'Revenue': format_currency(new_revenue),
+                'EBITDA': format_currency(new_ebitda),
+                'PAT': format_currency(new_pat),
+                'Status': '✅ Profitable' if new_pat > 0 else '❌ Loss'
+            })
+        
+        df_volume = pd.DataFrame(volume_scenarios)
+        st.dataframe(df_volume, hide_index=True, use_container_width=True)
+        
+        breakeven_util = (results['breakeven_kg'] / results['rice_kg_year'] * 85)
+        st.error(f"🚨 **Break-even Capacity**: {breakeven_util:.1f}% - Operating below this results in losses!")
+    
+    with analytics_tab3:
+        st.markdown("### 📈 Scenario Planning")
+        st.markdown("*Compare best case, base case, and worst case scenarios to prepare for various market conditions*")
+        
+        # Calculate scenarios
+        scenarios = calculate_scenario_analysis(inputs, results)
+        
+        # Scenario comparison chart
+        st.plotly_chart(create_scenario_comparison_chart(scenarios), use_container_width=True)
+        
+        st.markdown("---")
+        
+        # Detailed scenario breakdown
+        st.markdown("#### 📋 Detailed Scenario Analysis")
+        
+        scenario_col1, scenario_col2, scenario_col3 = st.columns(3)
+        
+        with scenario_col1:
+            st.markdown("##### 🌟 Best Case Scenario")
+            st.success("**Assumptions**: +15% price, +10% volume, -5% costs")
+            st.metric("Revenue", format_currency(scenarios['Best Case'][0]))
+            st.metric("EBITDA", format_currency(scenarios['Best Case'][1]))
+            st.metric("PAT", format_currency(scenarios['Best Case'][2]))
+            st.metric("ROI", f"{scenarios['Best Case'][3]:.1f}%")
+            
+            st.markdown("**Drivers:**")
+            st.write("✅ Strong market demand")
+            st.write("✅ Premium positioning")
+            st.write("✅ Operational excellence")
+            st.write("✅ Favorable raw material prices")
+        
+        with scenario_col2:
+            st.markdown("##### ⚖️ Base Case (Current)")
+            st.info("**Assumptions**: Current market conditions")
+            st.metric("Revenue", format_currency(scenarios['Base Case'][0]))
+            st.metric("EBITDA", format_currency(scenarios['Base Case'][1]))
+            st.metric("PAT", format_currency(scenarios['Base Case'][2]))
+            st.metric("ROI", f"{scenarios['Base Case'][3]:.1f}%")
+            
+            st.markdown("**Characteristics:**")
+            st.write("📊 Normal market conditions")
+            st.write("📊 Current pricing strategy")
+            st.write("📊 85% capacity utilization")
+            st.write("📊 Stable input costs")
+        
+        with scenario_col3:
+            st.markdown("##### ⚠️ Worst Case Scenario")
+            st.error("**Assumptions**: -10% price, -15% volume, +10% costs")
+            st.metric("Revenue", format_currency(scenarios['Worst Case'][0]))
+            st.metric("EBITDA", format_currency(scenarios['Worst Case'][1]))
+            st.metric("PAT", format_currency(scenarios['Worst Case'][2]))
+            st.metric("ROI", f"{scenarios['Worst Case'][3]:.1f}%")
+            
+            st.markdown("**Risk Factors:**")
+            st.write("❌ Price competition")
+            st.write("❌ Demand slowdown")
+            st.write("❌ Rising input costs")
+            st.write("❌ Operational challenges")
+        
+        st.markdown("---")
+        
+        # Probability-weighted expected value
+        st.markdown("#### 🎲 Probability-Weighted Analysis")
+        st.markdown("*Assign probabilities to each scenario to calculate expected outcomes*")
+        
+        prob_col1, prob_col2 = st.columns([1, 2])
+        
+        with prob_col1:
+            st.markdown("##### Probability Distribution")
+            best_prob = st.slider("Best Case Probability", 0, 100, 25, 5, help="Likelihood of best case occurring")
+            worst_prob = st.slider("Worst Case Probability", 0, 100, 15, 5, help="Likelihood of worst case occurring")
+            base_prob = 100 - best_prob - worst_prob
+            
+            if base_prob < 0:
+                st.error("⚠️ Total probability exceeds 100%! Adjust sliders.")
+            else:
+                st.success(f"✅ Base Case: {base_prob}%")
+        
+        with prob_col2:
+            if base_prob >= 0:
+                st.markdown("##### Expected Value Calculation")
+                
+                expected_revenue = (scenarios['Best Case'][0] * best_prob + 
+                                  scenarios['Base Case'][0] * base_prob + 
+                                  scenarios['Worst Case'][0] * worst_prob) / 100
+                
+                expected_pat = (scenarios['Best Case'][2] * best_prob + 
+                              scenarios['Base Case'][2] * base_prob + 
+                              scenarios['Worst Case'][2] * worst_prob) / 100
+                
+                expected_roi = (scenarios['Best Case'][3] * best_prob + 
+                              scenarios['Base Case'][3] * base_prob + 
+                              scenarios['Worst Case'][3] * worst_prob) / 100
+                
+                exp_col1, exp_col2, exp_col3 = st.columns(3)
+                
+                with exp_col1:
+                    st.metric("Expected Revenue", format_currency(expected_revenue),
+                             delta=f"{((expected_revenue - scenarios['Base Case'][0]) / scenarios['Base Case'][0] * 100):+.1f}% vs Base")
+                
+                with exp_col2:
+                    st.metric("Expected PAT", format_currency(expected_pat),
+                             delta=f"{((expected_pat - scenarios['Base Case'][2]) / scenarios['Base Case'][2] * 100):+.1f}% vs Base")
+                
+                with exp_col3:
+                    st.metric("Expected ROI", f"{expected_roi:.1f}%",
+                             delta=f"{(expected_roi - scenarios['Base Case'][3]):+.1f}pp vs Base")
+                
+                st.info(f"💡 **Insight**: Based on probability distribution ({best_prob}%/{base_prob}%/{worst_prob}%), your expected PAT is {format_currency(expected_pat)}, which is {((expected_pat - scenarios['Base Case'][2]) / scenarios['Base Case'][2] * 100):+.1f}% {'higher' if expected_pat > scenarios['Base Case'][2] else 'lower'} than base case.")
+    
+    with analytics_tab4:
+        st.markdown("### ⚡ AI-Powered Performance Insights")
+        st.markdown("*Advanced business intelligence to optimize operations and maximize profitability*")
+        
+        # Generate advanced insights
+        advanced_insights = generate_advanced_ai_insights(results, inputs, advanced_metrics)
+        
+        # Display insights with priority filtering
+        priority_filter = st.multiselect(
+            "Filter by Priority",
+            options=["HIGH", "MEDIUM", "LOW"],
+            default=["HIGH", "MEDIUM", "LOW"]
+        )
+        
+        filtered_insights = [i for i in advanced_insights if i['priority'] in priority_filter]
+        
+        for insight in filtered_insights:
+            # Priority badge color
+            if insight['priority'] == 'HIGH':
+                badge_color = "🔴"
+                expander_expanded = True
+            elif insight['priority'] == 'MEDIUM':
+                badge_color = "🟡"
+                expander_expanded = False
+            else:
+                badge_color = "🟢"
+                expander_expanded = False
+            
+            with st.expander(f"{badge_color} {insight['category']} - Priority: {insight['priority']}", expanded=expander_expanded):
+                st.markdown(f"#### {insight['insight']}")
+                
+                st.markdown("##### 🎯 Strategic Recommendations")
+                for rec in insight['recommendations']:
+                    st.markdown(rec)
+                
+                st.markdown("---")
+                st.success(f"💰 **Expected Impact**: {insight['impact']}")
+        
+        # Summary metrics
+        st.markdown("---")
+        st.markdown("#### 📈 Quick Action Summary")
+        
+        action_col1, action_col2, action_col3 = st.columns(3)
+        
+        with action_col1:
+            high_priority_count = len([i for i in advanced_insights if i['priority'] == 'HIGH'])
+            st.metric("High Priority Actions", high_priority_count, 
+                     help="Critical actions requiring immediate attention")
+        
+        with action_col2:
+            medium_priority_count = len([i for i in advanced_insights if i['priority'] == 'MEDIUM'])
+            st.metric("Medium Priority Actions", medium_priority_count,
+                     help="Important improvements for next quarter")
+        
+        with action_col3:
+            low_priority_count = len([i for i in advanced_insights if i['priority'] == 'LOW'])
+            st.metric("Strategic Opportunities", low_priority_count,
+                     help="Long-term growth initiatives")
     
     st.markdown("---")
     
